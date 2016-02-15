@@ -56,11 +56,12 @@ class Arm:
             mirror = False
             ):
         """
-        :number_of_joint    int     number of joints
-        :joint_angles       list    initial joint angles
-        :joint_lims         list    joint angles limits 
-        :segment_lengths    list    length of arm segmens
-        :origin             list    origin coords of arm
+
+number_of_joint:     (int)    number of joints
+        joint_angles       (list):    initial joint angles
+        joint_lims         (list):    joint angles limits 
+        segment_lengths    (list):    length of arm segmens
+        origin             (list):    origin coords of arm
         """
 
         self.mirror = mirror
@@ -87,8 +88,8 @@ class Arm:
         """    
         Finds the (x, y) coordinates
         of each joint   
-        :joint_angles   vector  current angles of the joints    
-        :return         array   'number of joint' [x,y] coordinates   
+        joint_angles   (vector):    current angles of the joints    
+        return          (array):    'number of joint' [x,y] coordinates   
         """ 
 
         #current angles
@@ -152,9 +153,10 @@ class Arm:
 def get_angle(v1,v2) :
     """
     Calculate the angle between two vectors
-    v1  array   first vector
-    v2  array   second vector
+    v1  (array):   first vector
+    v2  (array):   second vector
     """
+
     if (norm(v1)*norm(v2)) != 0 :     
         cosangle = dot(v1,v2)/(norm(v1)*norm(v2))
         cosangle = maximum(-1,minimum(1, cosangle))
@@ -171,10 +173,12 @@ class Polychain :
     # floating point precision
     HVERSOR = array([1,0])
 
-    # chain (array) : each row is a point (x,y) 
-    #                 of the polygonal chain
     def set_chain(self, chain) :
-        
+        '''
+         chain      (array):    each row is a point (x,y) 
+                                of the polygonal chain
+        '''
+
         # ensure it is a numpy array
         self.chain = array(chain[:])
         # the length of the chain (number of vertices)
@@ -198,11 +202,14 @@ class Polychain :
             bc = self.chain[x] - self.chain[x-1]
             self.seg_angles.append(get_angle(ab, bc))
 
-    # find out if a point belongs to the chain. 
-    # return : a list of distances correspoding to the the line 
-    #          intersection with that point. Empty list if
-    #          the point does not belong to the chain
     def isPointInChain(self, point, epsilon = 0.1 ) :
+        '''
+            find out if a point belongs to the chain. 
+            return:     a list of distances correspoding to the the line 
+                        intersection with that point. Empty list if
+                        the point does not belong to the chain
+        '''
+
         distances = []
         for x in xrange(1,len(self.chain) ) :
             
@@ -225,10 +232,12 @@ class Polychain :
 
         return distances
       
-    # get a point in the 2D space given a 
-    # distance from the first point of the chain 
     def get_point(self, distance) :
-        
+        '''
+        get a point in the 2D space given a 
+        distance from the first point of the chain 
+        '''
+
         if distance > 1 :
             raise ValueError('distance must be a proportion of the polyline length (0,1)')
 
@@ -249,8 +258,10 @@ class Polychain :
 
         return -1
 
-    # return: the length of the current polyline
     def get_length(self) :
+        '''
+        return: the length of the current polyline
+        '''
         return sum(self.seg_lens)
 
             
