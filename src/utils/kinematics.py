@@ -56,8 +56,7 @@ class Arm:
             mirror = False
             ):
         """
-
-number_of_joint:     (int)    number of joints
+        number_of_joint:     (int)    number of joints
         joint_angles       (list):    initial joint angles
         joint_lims         (list):    joint angles limits 
         segment_lengths    (list):    length of arm segmens
