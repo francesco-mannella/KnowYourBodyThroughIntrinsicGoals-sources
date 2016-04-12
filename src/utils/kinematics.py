@@ -257,14 +257,33 @@ class Polychain :
 
         return -1
 
+    def get_dense_chain(self, density) :
+
+        tot_len = self.get_length()
+        curr_len = 0
+        dense_chain = []
+        for x in xrange(1,len(self.chain) ) :
+            a = self.chain[x-1]
+            b = self.chain[x]
+            len_seg = norm(a-b)
+            points = 2**density -1
+            gap = (1.0/float(points+1))*len_seg
+            dense_chain.append(self.chain[0])
+            for d in xrange(points):
+                    dist = (curr_len +gap*(1+d))/ float(tot_len)
+                    dense_chain.append(self.get_point( dist ))
+            curr_len += len_seg
+
+        dense_chain.append(self.chain[-1])
+
+        return vstack(dense_chain)
+
     def get_length(self) :
         '''
         return: the length of the current polyline
         '''
         return sum(self.seg_lens)
 
-            
-  
 
 if __name__ == "__main__" :
     
@@ -297,6 +316,7 @@ if __name__ == "__main__" :
     ax.plot(xl, [0,0], c = "black", linestyle = "--")    # plot x-axis
     ax.plot([0,0], yl, c = "black", linestyle = "--")    # plot y-axis     
     external_point = scatter(*point, s= 30, c="r") # plot arm edges
+    dense_points = scatter(*zeros([2,25]), s= 20, c="green") # plot arm edges
     xlim(xl)
     ylim(yl) 
 
@@ -311,13 +331,16 @@ if __name__ == "__main__" :
         poly.set_chain(pos)
       
         point = poly.get_point(0.75)
-        
+
+        dense = poly.get_dense_chain(6)
+        print dense.shape
         # update plot
         segments.set_data(*pos.T)
         edges.set_offsets(pos)
-        external_point.set_offsets(point)      
+        external_point.set_offsets(point)
+        dense_points.set_offsets(dense)
         fig.canvas.draw()
-        pause(0.0001)
+        pause(.00001)
 
     raw_input()
 

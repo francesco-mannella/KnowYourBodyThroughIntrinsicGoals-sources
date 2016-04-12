@@ -1,0 +1,205 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+Arm	../utils/kinematics.py	/^class Arm:$/;"	c	inherits:
+ESN	../nets/esn.py	/^class ESN(object):$/;"	c	inherits:object
+GoalMaker	../model/GoalMaker.py	/^class GoalMaker(object):$/;"	c	inherits:object
+GoalPredictor	../model/GoalPredictor.py	/^class GoalPredictor :$/;"	c	inherits:
+GoalSelector	../model/GoalSelector.py	/^class GoalSelector :$/;"	c	inherits:
+GoalTesterSim	../model/GoalMaker.py	/^class GoalTesterSim(object):$/;"	c	inherits:object
+HVERSOR	../utils/kinematics.py	/^    HVERSOR = array([1,0])$/;"	v	class:Polychain
+KinematicActuator	../model/Controller.py	/^class KinematicActuator :$/;"	c	inherits:
+Kohonen	../nets/kohonen.py	/^class Kohonen :  $/;"	c	inherits:
+Main	../model/main.py	/^class Main:$/;"	c	inherits:
+MultidimensionalGaussianMaker	../utils/gauss_utils.py	/^class MultidimensionalGaussianMaker:$/;"	c	inherits:
+N	../nets/esn.py	/^    N = 200$/;"	v
+PerceptionManager	../model/Controller.py	/^class PerceptionManager:$/;"	c	inherits:
+Polychain	../utils/kinematics.py	/^class Polychain :$/;"	c	inherits:
+Robot	../model/Robot.py	/^class Robot :$/;"	c	inherits:
+SensorimotorController	../model/Controller.py	/^class SensorimotorController:$/;"	c	inherits:
+__init__	../model/Controller.py	/^    def __init__(self) :$/;"	m	class:KinematicActuator	access:public
+__init__	../model/Controller.py	/^    def __init__(self):$/;"	m	class:SensorimotorController	access:public
+__init__	../model/Controller.py	/^    def __init__(self, pixels=[20,20], lims=[[0,1],[0,1]], epsilon=0.2, touch_th = 0.9):$/;"	m	class:PerceptionManager	access:public
+__init__	../model/GoalMaker.py	/^    def __init__(self):$/;"	m	class:GoalTesterSim	access:public
+__init__	../model/GoalMaker.py	/^    def __init__(self, n_input_layers, n_singlemod_layers, n_hidden_layers, n_out, n_goalrep,singlemod_lrs,$/;"	m	class:GoalMaker	access:public
+__init__	../model/GoalPredictor.py	/^    def __init__(self, n_goal_units, eta) :$/;"	m	class:GoalPredictor	access:public
+__init__	../model/GoalSelector.py	/^    def __init__(self, dt, tau, alpha, epsilon, eta, n_input,$/;"	m	class:GoalSelector	access:public
+__init__	../model/Robot.py	/^    def __init__(self) :$/;"	m	class:Robot	access:public
+__init__	../model/main.py	/^    def __init__(self):$/;"	m	class:Main	access:public
+__init__	../nets/esn.py	/^    def __init__($/;"	m	class:ESN	access:public
+__init__	../nets/kohonen.py	/^    def __init__(self,$/;"	m	class:Kohonen	access:public
+__init__	../utils/gauss_utils.py	/^    def __init__(self, lims) :$/;"	m	class:MultidimensionalGaussianMaker	access:public
+__init__	../utils/kinematics.py	/^    def __init__(self,$/;"	m	class:Arm	access:public
+add_img	../model/main.py	/^    def add_img(self,win, row=None, col=None, rowspan=1, colspan=1) :$/;"	m	class:Main	access:public
+alpha	../model/test_main.py	/^            alpha = 0.1,$/;"	v
+angle	../utils/kinematics.py	/^    angle = zeros(3)  $/;"	v
+append_views	../model/main.py	/^    def append_views(self, items=1, row=None, col=None, rowspan=1, colspan=1) :$/;"	m	class:Main	access:public
+arm	../utils/kinematics.py	/^    arm = Arm($/;"	v
+ax	../model/Controller.py	/^    ax = fig.add_subplot(gs[:2,:], aspect="auto")$/;"	v
+ax	../model/test_main.py	/^    ax = fig.add_subplot(111,aspect="equal")$/;"	v
+ax	../utils/kinematics.py	/^    ax = fig.add_subplot(111)$/;"	v
+axes	../model/Controller.py	/^    axes = []$/;"	v
+chain	../model/test_main.py	/^    chain = KM.Polychain()$/;"	v
+cmap	../model/main.py	/^    cmap = pg.ColorMap(pos, color)$/;"	v	class:Main
+color	../model/main.py	/^    color = np.array([[255,255,255,255], [0,0,0,255]], dtype=np.ubyte)$/;"	v	class:Main
+color	../model/test_main.py	/^            color=[.2,.2,.2],$/;"	v
+color	../model/test_main.py	/^            color=[.6,.8,.6],$/;"	v
+color	../model/test_main.py	/^            color=[.8,.6,.6],$/;"	v
+color	../model/test_main.py	/^            color=[.8,.8,.8],$/;"	v
+controller	../model/Controller.py	/^    controller = SensorimotorController()$/;"	v
+controller	../model/test_main.py	/^    controller = Controller.SensorimotorController()$/;"	v
+controller	../nets/esn.py	/^    controller = ESN($/;"	v
+dense_points	../utils/kinematics.py	/^    dense_points = scatter(*zeros([2,25]), s= 20, c="green") # plot arm edges$/;"	v
+dt	../model/test_main.py	/^            dt = 0.001,$/;"	v
+edges	../utils/kinematics.py	/^    edges = ax.scatter(*pos.T) # plot arm edges$/;"	v
+epsilon	../model/test_main.py	/^            epsilon = 1.0e-10,$/;"	v
+eta	../model/test_main.py	/^            eta = 0.01$/;"	v
+eta	../model/test_main.py	/^            eta = 0.01,$/;"	v
+evaluate_rho	../nets/esn.py	/^def evaluate_rho(m):$/;"	f	access:public
+external_point	../utils/kinematics.py	/^    external_point = scatter(*point, s= 30, c="r") # plot arm edges$/;"	v
+fig	../model/Controller.py	/^    fig = plt.figure(figsize=(8,12))$/;"	v
+fig	../model/test_main.py	/^    fig = plt.figure()$/;"	v
+fig	../utils/kinematics.py	/^    fig = figure("arm")$/;"	v
+g2e_spars	../model/test_main.py	/^            g2e_spars = 0.01,$/;"	v
+gauss2d_oriented	../utils/gauss_utils.py	/^def gauss2d_oriented(x,y,m1,m2,std_x, std_y, theta) :$/;"	f	access:public
+get_angle	../utils/kinematics.py	/^def get_angle(v1,v2) :$/;"	f	access:public
+get_dense_chain	../utils/kinematics.py	/^    def get_dense_chain(self, density) :$/;"	m	class:Polychain	access:public
+get_gaussian	../utils/gauss_utils.py	/^    def get_gaussian(self, mu, sigma) :$/;"	m	class:MultidimensionalGaussianMaker	access:public
+get_image	../model/Controller.py	/^    def get_image(self, body_tokens):$/;"	m	class:PerceptionManager	access:public
+get_joint_positions	../utils/kinematics.py	/^    def get_joint_positions(self,  joint_angles  ):$/;"	m	class:Arm	access:public
+get_length	../utils/kinematics.py	/^    def get_length(self) :$/;"	m	class:Polychain	access:public
+get_point	../utils/kinematics.py	/^    def get_point(self, distance) :$/;"	m	class:Polychain	access:public
+get_proprioception	../model/Controller.py	/^    def get_proprioception(self, body_tokens, angles_tokens):$/;"	m	class:PerceptionManager	access:public
+get_touch	../model/Controller.py	/^    def get_touch(self, body_tokens, body_tokens_sensors):$/;"	m	class:PerceptionManager	access:public
+gm	../model/test_main.py	/^    gm = GoalMaker.GoalMaker($/;"	v
+gm_height	../model/test_main.py	/^    gm_height = 1.75$/;"	v
+gm_lt	../model/test_main.py	/^    gm_lt = 1.0$/;"	v
+gm_start	../model/test_main.py	/^    gm_start = -2.8$/;"	v
+gm_ts	../model/test_main.py	/^    gm_ts = gm_lt\/gs.N_GOAL_UNITS$/;"	v
+gmm_height	../model/test_main.py	/^    gmm_height = 1.5$/;"	v
+gmm_lt	../model/test_main.py	/^    gmm_lt = 1.0$/;"	v
+gmm_start	../model/test_main.py	/^    gmm_start = -2.8$/;"	v
+gmm_ts	../model/test_main.py	/^    gmm_ts = gmm_lt\/gs.N_GOAL_UNITS$/;"	v
+goal_index	../model/GoalSelector.py	/^    def goal_index(self):$/;"	m	class:GoalSelector	access:public
+goal_mask	../model/test_main.py	/^            goal_mask = np.logical_or(goal_mask, (gm.goalrep_layer > 0) )$/;"	v
+goal_mask	../model/test_main.py	/^    goal_mask = np.zeros(gs.N_GOAL_UNITS).astype("bool")$/;"	v
+goal_selection	../model/GoalSelector.py	/^    def goal_selection(self, im_value, goal_mask = None):$/;"	m	class:GoalSelector	access:public
+goal_th	../model/test_main.py	/^            goal_th=0.1$/;"	v
+goal_window	../model/test_main.py	/^            goal_window = 10,$/;"	v
+goalrep_lr	../model/test_main.py	/^            goalrep_lr=0.9,$/;"	v
+goalwin_idx	../model/test_main.py	/^                goalwin_idx = gs.goal_index()$/;"	v
+gp	../model/test_main.py	/^    gp = GoalPredictor.GoalPredictor($/;"	v
+grid	../utils/gauss_utils.py	/^def grid(bins) :$/;"	f	access:public
+gs	../model/Controller.py	/^    gs = gridspec.GridSpec(5, 2)$/;"	v
+gs	../model/test_main.py	/^    gs = GoalSelector.GoalSelector($/;"	v
+gs_height	../model/test_main.py	/^    gs_height = 2.0$/;"	v
+gs_lt	../model/test_main.py	/^    gs_lt = 1.0$/;"	v
+gs_start	../model/test_main.py	/^    gs_start = -2.8$/;"	v
+gs_ts	../model/test_main.py	/^    gs_ts = gs_lt\/gs.N_GOAL_UNITS$/;"	v
+gwl	../model/test_main.py	/^    gwl = ts*gs.GOAL_WINDOW$/;"	v
+hidden_lrs	../model/test_main.py	/^            hidden_lrs=[0.1, 0.1],$/;"	v
+idcs	../model/test_main.py	/^        idcs = np.nonzero(1*goal_mask)[0]$/;"	v
+idcs	../model/test_main.py	/^        idcs = np.nonzero(gm.goalrep_layer > 0)[0]$/;"	v
+idcs	../model/test_main.py	/^        idcs = np.squeeze(np.argwhere(gs.goal_win==True))$/;"	v
+im_decay	../model/test_main.py	/^            im_decay = 0.2,$/;"	v
+im_value	../model/test_main.py	/^                im_value = gp.prediction_error $/;"	v
+im_value	../model/test_main.py	/^    im_value = 0.0$/;"	v
+image_default	../model/Controller.py	/^    image_default = np.zeros([20, 20])$/;"	v
+imgs	../model/Controller.py	/^    imgs = []$/;"	v
+inp_dim	../model/test_main.py	/^    inp_dim = controller.pixels[0]*controller.pixels[1]$/;"	v
+isPointInChain	../utils/kinematics.py	/^    def isPointInChain(self, point, epsilon = 0.1 ) :$/;"	m	class:Polychain	access:public
+larm_angles	../model/test_main.py	/^                larm_angles=np.pi*gs.out[:(gs.N_ROUT_UNITS\/2)],$/;"	v
+learn	../model/GoalMaker.py	/^    def learn(self):$/;"	m	class:GoalMaker	access:public
+learn	../model/GoalPredictor.py	/^    def learn(self, match):$/;"	m	class:GoalPredictor	access:public
+learn	../model/GoalSelector.py	/^    def learn(self, match_value):$/;"	m	class:GoalSelector	access:public
+learn	../nets/kohonen.py	/^    def learn(self) :$/;"	m	class:Kohonen	access:public
+line	../utils/gauss_utils.py	/^            line =""$/;"	v
+line	../utils/gauss_utils.py	/^            line=line+ "{} ".format(mapND1D([x,y],[3,5]))$/;"	v
+line	../utils/gauss_utils.py	/^        line = ""$/;"	v
+line	../utils/gauss_utils.py	/^        line=line+ "{} ".format(map1DND(x,2,[3,5]))$/;"	v
+line	../utils/gauss_utils.py	/^    line = ""$/;"	v
+lut	../model/main.py	/^    lut = cmap.getLookupTable(0.0, 1.0, 256)$/;"	v	class:Main
+m	../utils/gauss_utils.py	/^    m = arange(15).reshape(3,5)$/;"	v
+main	../model/main.py	/^    main = Main()$/;"	v
+map1DND	../utils/gauss_utils.py	/^def map1DND(x,nDim,nBin) :$/;"	f	access:public
+mapND1D	../utils/gauss_utils.py	/^def mapND1D(idcs,nBin) :$/;"	f	access:public
+match	../model/GoalPredictor.py	/^def match(abstaction_layer, selection_layer) :$/;"	f	access:public
+match_value	../model/test_main.py	/^            match_value = GoalPredictor.match($/;"	v
+match_value	../model/test_main.py	/^    match_value = False$/;"	v
+my_argwhere	../model/GoalSelector.py	/^def my_argwhere(x) :$/;"	f	access:public
+n_echo_units	../model/test_main.py	/^            n_echo_units = 100,$/;"	v
+n_goal_units	../model/test_main.py	/^            n_goal_units = 10,$/;"	v
+n_goal_units	../model/test_main.py	/^            n_goal_units = 2,$/;"	v
+n_goalrep	../model/test_main.py	/^            n_goalrep= 10,$/;"	v
+n_hidden_layers	../model/test_main.py	/^            n_hidden_layers=[16, 16],$/;"	v
+n_input	../model/test_main.py	/^            n_input = controller.pixels[0]*controller.pixels[0],$/;"	v
+n_input_layers	../model/test_main.py	/^            n_input_layers=[inp_dim, inp_dim, inp_dim],$/;"	v
+n_out	../model/test_main.py	/^            n_out=16,$/;"	v
+n_rout_units	../model/test_main.py	/^            n_rout_units = controller.actuator.NUMBER_OF_JOINTS*2,$/;"	v
+n_singlemod_layers	../model/test_main.py	/^            n_singlemod_layers= [64, 64, 64],$/;"	v
+noise	../model/test_main.py	/^            noise = .5,$/;"	v
+normalize	../model/GoalMaker.py	/^def normalize(x) :$/;"	f	access:public
+normalize	../nets/esn.py	/^    def normalize(self, M, rho) :$/;"	m	class:ESN	access:public
+normalize	../nets/kohonen_colors.py	/^def normalize(x) :$/;"	f	access:public
+normalize_to_echo	../nets/esn.py	/^    def normalize_to_echo(self, epsilon) :$/;"	m	class:ESN	access:public
+output_lr	../model/test_main.py	/^            output_lr=0.1,$/;"	v
+period	../model/Controller.py	/^    period = 10.0$/;"	v
+point	../utils/kinematics.py	/^    point = poly.get_point(0.75)$/;"	v
+pointsl	../model/Controller.py	/^    pointsl = ax.scatter(*np.zeros([2,4]))$/;"	v
+pointsr	../model/Controller.py	/^    pointsr = ax.scatter(*np.zeros([2,4]))$/;"	v
+poly	../utils/kinematics.py	/^    poly = Polychain()$/;"	v
+pos	../model/main.py	/^    pos = np.array([0.0, 1.0])$/;"	v	class:Main
+randomize	../nets/esn.py	/^    def randomize(self) :$/;"	m	class:ESN	access:public
+rarm_angles	../model/test_main.py	/^                rarm_angles=np.pi*gs.out[(gs.N_ROUT_UNITS\/2):]$/;"	v
+reset	../model/Controller.py	/^    def reset(self) :$/;"	m	class:KinematicActuator	access:public
+reset	../model/Controller.py	/^    def reset(self):$/;"	m	class:SensorimotorController	access:public
+reset	../model/GoalSelector.py	/^    def reset(self, match):$/;"	m	class:GoalSelector	access:public
+reset	../nets/esn.py	/^    def reset(self):$/;"	m	class:ESN	access:public
+reset_data	../nets/esn.py	/^    def reset_data(self):$/;"	m	class:ESN	access:public
+reset_data	../nets/kohonen.py	/^    def reset_data(self):$/;"	m	class:Kohonen	access:public
+reset_window	../model/test_main.py	/^            reset_window = 4$/;"	v
+reshape_coupled_weights	../model/main.py	/^            def reshape_coupled_weights(w):$/;"	f	function:Main.update	access:public
+reshape_weights	../model/main.py	/^            def reshape_weights(w):$/;"	f	function:Main.update	access:public
+run_colors	../nets/kohonen_colors.py	/^def run_colors() :     $/;"	f	access:public
+rwl	../model/test_main.py	/^    rwl = ts*gs.RESET_WINDOW$/;"	v
+scaled_grid	../utils/gauss_utils.py	/^def scaled_grid(idcs, lims) :$/;"	f	access:public
+set_angles	../model/Controller.py	/^    def set_angles(self, angles_l, angles_r) :$/;"	m	class:KinematicActuator	access:public
+set_chain	../utils/kinematics.py	/^    def set_chain(self, chain) :$/;"	m	class:Polychain	access:public
+singlemod_lrs	../model/test_main.py	/^            singlemod_lrs = [0.3, 0.3, 0.3],$/;"	v
+skin_region	../model/test_main.py	/^            skin_region = [1e10,1e10]$/;"	v
+sm_temp	../model/test_main.py	/^            sm_temp = 0.2,$/;"	v
+softmax	../model/GoalSelector.py	/^def softmax(x, t=0.1):$/;"	f	access:public
+start	../model/main.py	/^    def start(self) :$/;"	m	class:Main	access:public
+static_inp	../model/test_main.py	/^                static_inp = np.random.rand(*static_inp.shape)$/;"	v
+step	../model/Controller.py	/^    def step(self, larm_delta_angles, rarm_delta_angles):$/;"	m	class:SensorimotorController	access:public
+step	../model/GoalMaker.py	/^    def step(self, raw_inputs):$/;"	m	class:GoalMaker	access:public
+step	../model/GoalMaker.py	/^    def step(self,t):$/;"	m	class:GoalTesterSim	access:public
+step	../model/GoalPredictor.py	/^    def step(self, goal_win):$/;"	m	class:GoalPredictor	access:public
+step	../model/GoalSelector.py	/^    def step(self, inp):$/;"	m	class:GoalSelector	access:public
+step	../model/Robot.py	/^    def step(self) :$/;"	m	class:Robot	access:public
+step	../nets/esn.py	/^    def step(self, inp):$/;"	m	class:ESN	access:public
+step	../nets/kohonen.py	/^    def step(self, inp) :$/;"	m	class:Kohonen	access:public
+step_fun	../model/GoalMaker.py	/^def step_fun(x, th):$/;"	f	access:public
+step_kinematic	../model/Controller.py	/^    def step_kinematic(self, larm_angles, rarm_angles):$/;"	m	class:SensorimotorController	access:public
+stime	../model/Controller.py	/^    stime = 100000$/;"	v
+stime	../model/test_main.py	/^    stime = 10000$/;"	v
+stop	../model/main.py	/^    def stop(self) :$/;"	m	class:Main	access:public
+store	../model/GoalMaker.py	/^    def store(self):$/;"	m	class:GoalMaker	access:public
+store	../nets/esn.py	/^    def store(self, tt):$/;"	m	class:ESN	access:public
+store	../nets/kohonen.py	/^    def store(self):$/;"	m	class:Kohonen	access:public
+target	../model/test_main.py	/^    target = (0.98, 0.78)$/;"	v
+target_angles	../model/test_main.py	/^                target_angles = gs.target_position[goalwin_idx]$/;"	v
+tau	../model/test_main.py	/^            tau = 0.08,$/;"	v
+tl_height	../model/test_main.py	/^    tl_height = 2.5$/;"	v
+tl_lt	../model/test_main.py	/^    tl_lt = 2.0$/;"	v
+tl_start	../model/test_main.py	/^    tl_start = -2.8$/;"	v
+touch	../model/test_main.py	/^    touch = False$/;"	v
+trial_window	../model/test_main.py	/^    trial_window = gs.RESET_WINDOW + gs.GOAL_WINDOW$/;"	v
+ts	../model/test_main.py	/^    ts = tl_lt\/float(trial_window)$/;"	v
+update	../model/main.py	/^    def update(self):$/;"	m	class:Main	access:public
+update_target	../model/GoalSelector.py	/^    def update_target(self):$/;"	m	class:GoalSelector	access:public
+xl	../utils/kinematics.py	/^    xl = [-4,4]    # x-axis limits$/;"	v
+yl	../utils/kinematics.py	/^    yl = [-4,4]    #y-axis limits$/;"	v
