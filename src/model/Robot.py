@@ -18,22 +18,25 @@ class Robot :
     
         self.controller = Controller.SensorimotorController()
 
+        self.GOAL_NUMBER = 9
+
         self.gs = GoalSelector.GoalSelector(
                 dt = 0.001,
-                tau = 0.08,
+                tau = 0.008,
                 alpha = 0.1,
                 epsilon = 1.0e-10,
-                eta = 0.01,
+                eta = 0.04,
                 n_input = self.controller.pixels[0]*self.controller.pixels[0],
-                n_goal_units = 10,
+                n_goal_units = self.GOAL_NUMBER,
                 n_echo_units = 100,
                 n_rout_units = self.controller.actuator.NUMBER_OF_JOINTS*2,
-                im_decay = 0.2,
+                im_decay = 0.01,
                 noise = .5,
                 sm_temp = 0.2,
-                g2e_spars = 0.01,
-                goal_window = 10,
-                reset_window = 4
+                g2e_spars = 0.2,
+                echo_ampl = 5.0,
+                goal_window = 100,
+                reset_window = 10
                 )
 
         self.gp = GoalPredictor.GoalPredictor(
@@ -47,11 +50,11 @@ class Robot :
                 n_singlemod_layers= [64, 64, 64],
                 n_hidden_layers=[16, 16],
                 n_out=16,
-                n_goalrep= 10,
-                singlemod_lrs = [0.3, 0.3, 0.3],
-                hidden_lrs=[0.1, 0.1],
-                output_lr=0.1,
-                goalrep_lr=0.9,
+                n_goalrep= self.GOAL_NUMBER,
+                singlemod_lrs = [0.05, 0.05, 0.05],
+                hidden_lrs=[0.01, 0.01],
+                output_lr=0.001,
+                goalrep_lr=0.2,
                 goal_th=0.1
             )
 
@@ -67,7 +70,81 @@ class Robot :
         self.intrinsic_motivation_value = 0.0
     
         self.static_inp = np.zeros(self.gs.N_INPUT)
- 
+    
+    def get_selection_arrays(self) :
+
+        sel = self.gs.goal_selected
+        
+        gmask = self.goal_mask.astype("float")
+        gv = self.gs.goalvec
+        gw = self.gs.goal_win
+        gr = self.gm.goalrep_layer
+        acquired_targets = self.gs.from_goal_index(self.gs.target_position.keys()) 
+         
+        targets = np.array([ 1.0*(target in acquired_targets) 
+            for target in np.arange(self.gs.N_GOAL_UNITS) ])
+        esn_data = self.gs.echonet.data[self.gs.echonet.out_lab]
+
+        return gmask, gv, gw, gr, targets, esn_data
+        
+
+    def get_sensory_arrays(self) :
+
+        i1, i2, i3 = self.gm.input_layers
+        sm1, sm2, sm3 = self.gm.singlemod_layers
+        h1, h2 = self.gm.hidden_layers
+        wsm1, wsm2, wsm3 = (som.inp2out_w for som in self.gm.singlemod_soms)
+        wh1, wh2 = (som.inp2out_w for som in self.gm.hidden_soms)
+        wo1 = self.gm.out_som.inp2out_w
+        o1 = self.gm.output_layer
+        wgr1 = self.gm.goalrep_som.inp2out_w
+        gr1 = self.gm.goalrep_layer
+
+        return (i1, i2, i3, sm1, sm2, sm3, h1, 
+                h2, o1, wsm1, wsm2, wsm3, wh1,
+                wh2, wo1, wgr1, gr1)
+
+    def get_arm_positions(self) :
+        
+        sel = self.gs.goal_selected
+        
+        real = np.pi*self.gs.out
+        self.controller.actuator.set_angles(
+                real[:(self.gs.N_ROUT_UNITS/2)],
+                real[(self.gs.N_ROUT_UNITS/2):]
+                )
+        real_l_pos = self.controller.actuator.position_l
+        real_r_pos = self.controller.actuator.position_r
+        real_l_pos *= sel
+        real_r_pos *= sel
+
+        try:    
+            goalwin_idx = self.gs.goal_index()
+            target = np.pi*self.gs.target_position[goalwin_idx]
+            self.controller.actuator.set_angles(
+                    target[:(self.gs.N_ROUT_UNITS/2)],
+                    target[(self.gs.N_ROUT_UNITS/2):],
+                    )
+            target_l_pos = self.controller.actuator.position_l
+            target_r_pos = self.controller.actuator.position_r
+        except KeyError:
+            target_l_pos = self.controller.actuator.position_l*0
+            target_r_pos = self.controller.actuator.position_r*0
+        target_l_pos *= sel
+        target_r_pos *= sel
+
+        theoric = np.pi*self.gs.tout
+        self.controller.actuator.set_angles(
+                theoric[:(self.gs.N_ROUT_UNITS/2)],
+                theoric[(self.gs.N_ROUT_UNITS/2):]
+                )
+        theor_l_pos = self.controller.actuator.position_l
+        theor_r_pos = self.controller.actuator.position_r
+
+
+        return (real_l_pos, real_r_pos, target_l_pos,
+                target_r_pos, theor_l_pos, theor_r_pos)
+
     def step(self) :
    
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:

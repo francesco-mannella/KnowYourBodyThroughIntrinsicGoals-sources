@@ -52,7 +52,7 @@ class PerceptionManager:
 
         return image.T
 
-    def get_touch(self, body_tokens, body_tokens_sensors):
+    def get_touch(self, body_tokens, init_body_tokens, body_tokens_sensors):
 
         sensors_points = []
         for point,is_sensor in zip(body_tokens, body_tokens_sensors):
@@ -60,14 +60,16 @@ class PerceptionManager:
                 sensors_points.append(point)
 
         image = np.zeros(self.pixels)
-        for c in body_tokens:
+        for c, ci in zip(body_tokens, init_body_tokens):
             self.chain.set_chain(c)
             dense_chain = self.chain.get_dense_chain(2)
-            for point in dense_chain:
+            self.chain.set_chain(ci)
+            dense_chain_pos = self.chain.get_dense_chain(2)
+            for point, pos in zip(dense_chain, dense_chain_pos):
                 for sensor in  sensors_points :
                     touch = np.exp(-((np.linalg.norm(point) -
                                       np.linalg.norm(sensor))**2) )
-                    g,_ = self.gm.get_gaussian(point, 0.01*np.ones(2) )
+                    g,_ = self.gm.get_gaussian(pos, np.ones(2)*(self.sigma**2 + 2) )
                     image += g.reshape(*self.pixels)*(touch>self.touch_th)
 
             image /= float(len(point))
@@ -86,12 +88,13 @@ class KinematicActuator :
     #-------------------------------------------------------------------------
     def __init__(self) :
         self.NUMBER_OF_JOINTS = 3
-        self.ORIGIN = [0.0, 0.0]
+        self.L_ORIGIN = [-1.5, 0.0]
+        self.R_ORIGIN = [1.5, 0.0]
         self.arm_l = KM.Arm(
             number_of_joint = self.NUMBER_OF_JOINTS,    # 3 joints
-            origin = self.ORIGIN, # origin at (1.0 , 0.5)
+            origin = self.L_ORIGIN, # origin at (1.0 , 0.5)
             joint_lims = [
-                [0, np.pi*0.5],    # first joint limits
+                [0, np.pi*0.9],    # first joint limits
                 [0, np.pi*0.5],    # second joint limits
                 [0, np.pi*0.5]     # third joint limits
                 ],
@@ -99,9 +102,9 @@ class KinematicActuator :
         )
         self.arm_r = KM.Arm(
             number_of_joint = self.NUMBER_OF_JOINTS,    # 3 joints
-            origin = self.ORIGIN, # origin at (1.0 , 0.5)
+            origin = self.R_ORIGIN, # origin at (1.0 , 0.5)
             joint_lims = [
-                [0, np.pi*0.5],    # first joint limits
+                [0, np.pi*0.9],    # first joint limits
                 [0, np.pi*0.5],    # second joint limits
                 [0, np.pi*0.5],     # third joint limits
                 ]
@@ -166,8 +169,8 @@ class SensorimotorController:
 
         self.actuator.set_angles(np.array([np.pi / 6., 0, 0]),
                              np.array([np.pi / 6., 0, 0]))
-        self.init_body_tokens = [self.actuator.position_l,
-                                 self.actuator.position_r]
+        self.init_body_tokens = (self.actuator.position_l,        
+                                 self.actuator.position_r)
         self.touch_mask = [[0,0,0,1],[0,0,0,1]]
 
     def step(self, larm_delta_angles, rarm_delta_angles):
@@ -178,26 +181,33 @@ class SensorimotorController:
         self.rarm_angles += rarm_delta_angles
 
         self.actuator.set_angles(self.larm_angles, self.rarm_angles)
-        self.larm_angles, self.rarm_angles = (self.actuator.angles_l, self.actuator.angles_r)
+        self.larm_angles, self.rarm_angles = (self.actuator.angles_l, 
+                self.actuator.angles_r)
 
         # VISUAL POSITION
-        curr_body_tokens = (self.actuator.position_l, self.actuator.position_r)
+        curr_body_tokens = (self.actuator.position_l,
+                self.actuator.position_r)
         self.pos = self.perc.get_image(body_tokens=curr_body_tokens)
         self.pos_delta = self.pos - self.pos_old
 
 
         # PROPRIOCEPTION
         body_tokens = self.init_body_tokens
-        angles_tokens = np.vstack([self.larm_angles, self.rarm_angles ])
-        self.prop = self.perc.get_proprioception(body_tokens= body_tokens,
-                                            angles_tokens=angles_tokens * 0.1)
-        angles_tokens = np.vstack([self.larm_delta_angles, self.rarm_delta_angles ])
-        self.prop_delta = self.perc.get_proprioception(body_tokens=body_tokens,
-                                                  angles_tokens=angles_tokens * 0.1)
+        angles_tokens = (self.larm_angles, self.rarm_angles )
+        self.prop = self.perc.get_proprioception(
+                body_tokens= body_tokens,
+                angles_tokens=angles_tokens)
+        delta_angles_tokens = (self.larm_delta_angles,
+                self.rarm_delta_angles)
+        self.prop_delta = self.perc.get_proprioception(
+                body_tokens=body_tokens,
+                angles_tokens=delta_angles_tokens)
 
         #TOUCH
-        self.touch = self.perc.get_touch(body_tokens=curr_body_tokens,
-                                         body_tokens_sensors=self.touch_mask)
+        self.touch = self.perc.get_touch(
+                body_tokens=curr_body_tokens,
+                init_body_tokens=self.init_body_tokens,                
+                body_tokens_sensors=self.touch_mask)
         self.touch_delta = self.touch - self.touch_old
 
         self.pos_old = self.pos
@@ -214,26 +224,32 @@ class SensorimotorController:
 
 
         self.actuator.set_angles(self.larm_angles, self.rarm_angles)
-        self.larm_angles, self.rarm_angles = (self.actuator.angles_l, self.actuator.angles_r)
+        self.larm_angles, self.rarm_angles = (self.actuator.angles_l, 
+                self.actuator.angles_r)
 
         # VISUAL POSITION
-        curr_body_tokens = (self.actuator.position_l, self.actuator.position_r)
+        curr_body_tokens = (self.actuator.position_l, 
+                self.actuator.position_r)
         self.pos = self.perc.get_image(body_tokens=curr_body_tokens)
         self.pos_delta = self.pos - self.pos_old
 
-
         # PROPRIOCEPTION
         body_tokens = self.init_body_tokens
-        angles_tokens = np.vstack([self.larm_angles, self.rarm_angles ])
-        self.prop = self.perc.get_proprioception(body_tokens= body_tokens,
-                                            angles_tokens=angles_tokens * 0.1)
-        angles_tokens = np.vstack([self.larm_delta_angles, self.rarm_delta_angles ])
-        self.prop_delta = self.perc.get_proprioception(body_tokens=body_tokens,
-                                                  angles_tokens=angles_tokens * 0.1)
+        angles_tokens = (self.larm_angles, self.rarm_angles)
+        self.prop = self.perc.get_proprioception(
+                body_tokens= body_tokens,
+                angles_tokens=angles_tokens)
+        delta_angles_tokens = (self.larm_delta_angles,
+                self.rarm_delta_angles)
+        self.prop_delta = self.perc.get_proprioception(
+                body_tokens=body_tokens,
+                angles_tokens=delta_angles_tokens)
 
         #TOUCH
-        self.touch = self.perc.get_touch(body_tokens=curr_body_tokens,
-                                         body_tokens_sensors=self.touch_mask)
+        self.touch = self.perc.get_touch(
+                body_tokens=curr_body_tokens,
+                init_body_tokens=self.init_body_tokens,                
+                body_tokens_sensors=self.touch_mask)
         self.touch_delta = self.touch - self.touch_old
 
         self.pos_old = self.pos

@@ -18,15 +18,26 @@ def softmax(x, t=0.1):
     return e/np.sum(e)
 
 def my_argwhere(x) :
+    
     res = np.nonzero(x)[0]
 
     return res
+
+def oscillator(x, scale, p) :
+    
+    x = np.array(x)
+    p = np.array(p)
+    x = np.outer(x, np.ones(p.shape))
+    
+    return np.cos(p*5*np.pi*(x/scale-p))
+
 
 class GoalSelector :
 
     def __init__(self, dt, tau, alpha, epsilon, eta, n_input,
             n_goal_units, n_echo_units, n_rout_units,
-            im_decay, noise, sm_temp, g2e_spars, goal_window, reset_window):
+            im_decay, noise, sm_temp, g2e_spars, goal_window, 
+            reset_window, echo_ampl=1000):
         '''
         :param dt: integration time of the ESN
         :param tau: decay of the ESN
@@ -42,6 +53,7 @@ class GoalSelector :
         :param sm_temp: temperature of the softmax
         :param g2e_spars: sparseness of weights form goals to esn
         :param goal_window: max duration of a goal selection
+        :param echo_ampl: amplitude of the input to the echo-state
         '''
 
         self.DT = dt
@@ -60,12 +72,12 @@ class GoalSelector :
         self.N_ECHO_UNITS = n_echo_units
         self.N_ROUT_UNITS = n_rout_units
         self.GOAL2ECHO_SPARSENESS = g2e_spars
+        self.ECHO_AMPL = echo_ampl
 
         self.goalvec = np.zeros(self.N_GOAL_UNITS)
         self.goal_win = np.zeros(self.N_GOAL_UNITS)
         self.goal_window_counter = 0
         self.reset_window_counter = 0
-
 
         self.echonet = ESN(
                 N       = self.N_ECHO_UNITS,
@@ -81,7 +93,7 @@ class GoalSelector :
         self.INP2ECHO_W = np.zeros([self.N_ECHO_UNITS, 
             self.N_INPUT+ self.N_GOAL_UNITS])
         
-        self.INP2ECHO_W[(self.N_ECHO_UNITS/2):,:] = \
+        self.INP2ECHO_W[(self.N_ECHO_UNITS/2):, :] = \
                 np.random.randn(self.N_ECHO_UNITS/2, 
                         self.N_INPUT+ self.N_GOAL_UNITS)
         
@@ -100,8 +112,7 @@ class GoalSelector :
         self.GOAL2ECHO_W[:(self.N_ECHO_UNITS/2), :] *= \
                 (np.random.rand((self.N_ECHO_UNITS/2),
                     self.N_GOAL_UNITS)<self.GOAL2ECHO_SPARSENESS)
-
-       
+ 
         self.echo2out_w = 0.1*np.random.randn(self.N_ROUT_UNITS,
             self.N_ECHO_UNITS)
 
@@ -114,10 +125,18 @@ class GoalSelector :
         self.curr_noise = 0.0
 
         self.goal_selected = False
+        self.random_oscil = np.random.rand(self.N_ROUT_UNITS)
+        self.t = 0
 
     def goal_index(self):
+        
         idx = sum(2**(np.arange(self.N_GOAL_UNITS) )* self.goal_win)
+
         return idx
+    
+    def from_goal_index(self, idx):      
+        return  np.log2(idx)
+
 
     def goal_selection(self, im_value, goal_mask = None):
         '''
@@ -161,6 +180,9 @@ class GoalSelector :
 
             self.goal_selected = True
 
+            self.t = 0
+            self.random_oscil = np.random.rand(self.N_ROUT_UNITS)
+
 
     def update_target(self):
         goalwin_idx = self.goal_index()
@@ -187,7 +209,7 @@ class GoalSelector :
             self.goal_window_counter = 0
             self.reset_window_counter = 0
             self.echonet.reset()
-
+            self.echonet.reset_data()
     
     def step(self, inp):
         '''
@@ -208,7 +230,7 @@ class GoalSelector :
                     )) )
 
         echo_inp = inp2echo_inp + goal2echo_inp
-        self.echonet.step(1000*echo_inp) # TODO add parameters x 10
+        self.echonet.step(self.ECHO_AMPL*echo_inp) 
         self.echonet.store(self.goal_window_counter)
 
         self.inp = self.echonet.out
@@ -216,12 +238,15 @@ class GoalSelector :
         self.curr_noise = self.NOISE*(1.0 - self.match_mean[self.goal_win>0])
         if np.all(self.goal_win==0):
             self.curr_noise = 0.0
-        self.out = self.read_out + \
-                self.curr_noise*np.random.randn(self.N_ROUT_UNITS)
+ 
+        added_signal = self.curr_noise*oscillator(self.t, 30, self.random_oscil)[0]
+        self.out = self.read_out + added_signal 
+
         self.out = np.maximum(0,np.minimum(1, self.out))
         self.tout = self.read_out 
         self.tout = np.maximum(0,np.minimum(1, self.tout))
-
+        
+        self.t += 1
 
     def learn(self, match_value):
 
