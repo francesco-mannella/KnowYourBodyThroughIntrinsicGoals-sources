@@ -43,7 +43,7 @@ pg.setConfigOptions(antialias=True)
 def reshape_weights(w):
     reshaped_w = []
     reshaped_w_raw = []
-    single_w_raws = np.sqrt(len(w[0]))
+    single_w_raws = int(np.sqrt(len(w[0])))
     single_w_cols = single_w_raws
 
     n_single_w = len(w)
@@ -68,7 +68,7 @@ def reshape_coupled_weights(w):
 
     reshaped_w = []
     reshaped_w_raw = []
-    single_w_raws = np.sqrt(len(w[0])/2)
+    single_w_raws = int(np.sqrt(len(w[0])/2))
     single_w_cols = 2*single_w_raws
 
     n_single_w = len(w)
@@ -171,6 +171,7 @@ class Main(QtGui.QWidget):
             
         self.kin_toggle = not self.kin_toggle
         if self.kin_toggle :
+            kin.start()
             kin.show()
         else:
             kin.hide()   
@@ -178,7 +179,7 @@ class Main(QtGui.QWidget):
     def onSimButton(self) :
             
         self.sim_toggle = not self.sim_toggle
-        if self.sim_toggle :
+        if self.sim_toggle == True:
             self.time_id = self.startTimer(self.ts_duration)
             self.simButton.setFlat(True)
             self.simButton.setText("stop")
@@ -200,12 +201,12 @@ class Main(QtGui.QWidget):
     
 
         self.ts_duration = value*self.interval
-        try:
-            self.killTimer(self.time_id)
-            self.time_id = self.startTimer(self.ts_duration)
-            print self.ts_duration
-        except AttributeError:
-            pass
+        if self.sim_toggle == True:
+            try:
+                self.killTimer(self.time_id)
+                self.time_id = self.startTimer(self.ts_duration)
+            except AttributeError:
+                pass
 
             
 #################################################################
@@ -222,18 +223,14 @@ class GoalAbstractionMaps(pg.GraphicsView):
     def __init__(self, app, robot):
          
 	super(GoalAbstractionMaps, self).__init__()
-        
-        screen_resolution = app.desktop().screenGeometry()
-        width, height = screen_resolution.width(), screen_resolution.height()
-         
-        self.LEFT = height*(8/20.)
-        self.TOP = height*(2/20.)
-        self.WIDTH = height*(6/20.)
-        self.HEIGHT = height*(16/20.)
-        
-        self.setGeometry(self.LEFT, self.TOP, self.WIDTH, self.HEIGHT)
+        self.robot = robot
+        self.ts_duration = 100 
+        self.main_app = app
+
 	self.setWindowTitle("Maps")
         
+        self.resetWindow()
+
         self.layout = pg.GraphicsLayout(
                 border=pg.mkPen({'color':'300','width':2}))
         self.setCentralItem(self.layout) 
@@ -260,9 +257,20 @@ class GoalAbstractionMaps(pg.GraphicsView):
         self.append_views(items=1,row=7,col=2)
         self.append_views(items=1,row=8,col=0)
 
-        self.robot = robot
+
+    def resetWindow(self):
+
+        screen_resolution = self.main_app.desktop().screenGeometry()
+        width, height = screen_resolution.width(), screen_resolution.height()
+         
+        self.LEFT = height*(8/20.)
+        self.TOP = height*(2/20.)
+        self.WIDTH = height*(6/20.)
+        self.HEIGHT = height*(16/20.)
         
-        self.ts_duration = 100
+        self.setGeometry(self.LEFT, self.TOP, self.WIDTH, self.HEIGHT)
+
+
 
     def append_views(self, items=1, row=None, col=None, 
             rowspan=1, colspan=1) :
@@ -300,7 +308,7 @@ class GoalAbstractionMaps(pg.GraphicsView):
         wsmm2 = reshape_weights(wsm2)
         wsmm3 = reshape_weights(wsm3)
 
-        raw_sm1 = np.sqrt(len(sm1))
+        raw_sm1 = int(np.sqrt(len(sm1)))
         sm1 = sm1.reshape(raw_sm1,raw_sm1, order="F")
         sm2 = sm2.reshape(raw_sm1,raw_sm1, order="F")
         sm3 = sm3.reshape(raw_sm1,raw_sm1, order="F")
@@ -309,16 +317,16 @@ class GoalAbstractionMaps(pg.GraphicsView):
         whh2 = reshape_coupled_weights(wh2)
         woo1 = reshape_coupled_weights(wo1)
 
-        raw_h1 = np.sqrt(len(h1))
+        raw_h1 = int(np.sqrt(len(h1)))
         h1 = h1.reshape(raw_h1,raw_h1, order="F")
         h2 = h2.reshape(raw_h1,raw_h1, order="F")
 
-        raw_inp = np.sqrt(len(i1))
+        raw_inp = int(np.sqrt(len(i1)))
         i1 = i1.reshape(raw_inp,raw_inp, order="F")
         i2 = i2.reshape(raw_inp,raw_inp, order="F")
         i3 = i3.reshape(raw_inp,raw_inp, order="F")
 
-        raw_out = np.sqrt(len(o1))
+        raw_out = int(np.sqrt(len(o1)))
         o1 = o1.reshape(raw_out, raw_out)
 
         sm_l = len(wsm1)
@@ -345,7 +353,7 @@ class GoalAbstractionMaps(pg.GraphicsView):
         wo_gr = wgr1[:,(3*sm_l+3*h_l):((3*sm_l+3*h_l) + o_l)]
         reshape_weights(wo_gr)
 
-        raw_gr1 = np.sqrt(len(gr1))
+        raw_gr1 = int(np.sqrt(len(gr1)))
         gr1 = gr1.reshape(raw_gr1,raw_gr1, order="F")
 
         self.imgs[0].setImage( i1 , levels=(-1,1) )
@@ -379,6 +387,7 @@ class GoalAbstractionMaps(pg.GraphicsView):
         self.update()
 
     def start(self) :
+        self.resetWindow()
         self.time_id = self.startTimer(self.ts_duration)
 
     def stop(self) :
@@ -399,16 +408,10 @@ class GoalSelectionMaps(pg.GraphicsView):
     def __init__(self, app, robot):
          
 	super(GoalSelectionMaps, self).__init__()
+        self.main_app = app
         
-        screen_resolution = app.desktop().screenGeometry()
-        width, height = screen_resolution.width(), screen_resolution.height()
-         
-        self.LEFT = height*(14/20.)
-        self.TOP = height*(8/20.)
-        self.WIDTH = height*(15/20.)
-        self.HEIGHT = height*(10/20.)
-        
-        self.setGeometry(self.LEFT, self.TOP, self.WIDTH, self.HEIGHT)
+        self.resetWindow()
+
 	self.setWindowTitle("Maps")
                
         layout = pg.GraphicsLayout(border=pg.mkPen({'color':'300','width':2}))
@@ -450,6 +453,18 @@ class GoalSelectionMaps(pg.GraphicsView):
       
         self.ts_duration = 1
 
+    def resetWindow(self):
+        
+        screen_resolution = self.main_app.desktop().screenGeometry()
+        width, height = screen_resolution.width(), screen_resolution.height()
+         
+        self.LEFT = height*(14/20.)
+        self.TOP = height*(8/20.)
+        self.WIDTH = height*(15/20.)
+        self.HEIGHT = height*(10/20.)
+        
+        self.setGeometry(self.LEFT, self.TOP, self.WIDTH, self.HEIGHT)
+
 
     def timerEvent(self, event):
         
@@ -468,6 +483,7 @@ class GoalSelectionMaps(pg.GraphicsView):
         self.update()
 
     def start(self) :
+        self.resetWindow()
         self.time_id = self.startTimer(self.ts_duration)
 
     def stop(self) :
@@ -484,35 +500,42 @@ class KinematicsView(QtGui.QWidget):
 	
         super(KinematicsView, self).__init__()
         
-        screen_resolution = app.desktop().screenGeometry()
-        width, height = screen_resolution.width(), screen_resolution.height()
-         
-        self.LEFT = height*(14/20.)
-        self.TOP = height*(2/20.)
-        self.WIDTH = height*(15/20.)
-        self.HEIGHT = height*(6/20.)
-        
-        self.setGeometry(self.LEFT, self.TOP, self.WIDTH, self.HEIGHT)
-        
-        self.WINDOW_BOTTOM = -1.0 
-        self.WINDOW_LEFT = -5.0
-        self.WINDOW_WIDTH = 10.0
-        self.WINDOW_HEIGHT = 4.0
-        
+        self.main_app = app
+       
+        self.resetWindow()
+
         self.LINE_WIDTH = 0.04
         self.AXIS_LINE_WIDTH = 0.01
         self.DOT_RADIUS = 0.06
-        self.WINDOW_PX_WIDTH = self.WIDTH 
-        self.WINDOW_PX_HEIGHT = self.HEIGHT
         self.STIME = robot.stime
-
         self.robot = robot
 
 	self.setWindowTitle("Kinematics")
 
         self.ts_duration = 100
         self.time_id = self.startTimer(self.ts_duration)
+    
+    def resetWindow(self):
         
+        screen_resolution = self.main_app.desktop().screenGeometry()
+        width, height = screen_resolution.width(), screen_resolution.height()
+         
+        self.LEFT = height*(14/20.)
+        self.TOP = height*(2/20.)
+        self.GAP = height*(1/20.)
+        
+        
+        self.WINDOW_BOTTOM = -2.0 
+        self.WINDOW_LEFT = -5.0
+        self.WINDOW_WIDTH = 10.0
+        self.WINDOW_HEIGHT = 6.0
+        
+        self.WINDOW_PX_WIDTH = self.WINDOW_WIDTH*self.GAP 
+        self.WINDOW_PX_HEIGHT = self.WINDOW_HEIGHT*self.GAP
+        self.setGeometry(self.LEFT, self.TOP, self.WINDOW_PX_WIDTH, self.WINDOW_PX_HEIGHT)
+
+
+
     def poly(self, pts):
         
         return QtGui.QPolygonF([QtCore.QPointF(p[0], p[1]) for p in pts]) 
@@ -599,6 +622,9 @@ class KinematicsView(QtGui.QWidget):
     def timerEvent(self,event):
         
         self.update()
+    
+    def start(self) :
+        self.resetWindow()
 
 
 #################################################################

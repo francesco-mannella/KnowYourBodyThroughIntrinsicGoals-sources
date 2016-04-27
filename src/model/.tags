@@ -6,6 +6,7 @@
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 Arm	../utils/kinematics.py	/^class Arm:$/;"	c	inherits:
 ESN	../nets/esn.py	/^class ESN(object):$/;"	c	inherits:object
+GaussianMaker	../nets/kohonen.py	/^GaussianMaker = OptimizedGaussianMaker$/;"	v
 GoalAbstractionMaps	../model/main.py	/^class GoalAbstractionMaps(pg.GraphicsView):$/;"	c	inherits:pg.GraphicsView
 GoalMaker	../model/GoalMaker.py	/^class GoalMaker(object):$/;"	c	inherits:object
 GoalPredictor	../model/GoalPredictor.py	/^class GoalPredictor :$/;"	c	inherits:
@@ -19,13 +20,20 @@ Kohonen	../nets/kohonen.py	/^class Kohonen :  $/;"	c	inherits:
 Main	../model/main.py	/^class Main(QtGui.QWidget):$/;"	c	inherits:QtGui.QWidget
 MultidimensionalGaussianMaker	../utils/gauss_utils.py	/^class MultidimensionalGaussianMaker:$/;"	c	inherits:
 N	../nets/esn.py	/^    N = 200$/;"	v
+OneDimensionalGaussianMaker	../utils/gauss_utils.py	/^class OneDimensionalGaussianMaker:$/;"	c	inherits:
+OptimizedGaussianMaker	../utils/gauss_utils.py	/^class OptimizedGaussianMaker:$/;"	c	inherits:
 PerceptionManager	../model/Controller.py	/^class PerceptionManager:$/;"	c	inherits:
 Polychain	../utils/kinematics.py	/^class Polychain :$/;"	c	inherits:
 Robot	../model/Robot.py	/^class Robot :$/;"	c	inherits:
 SensorimotorController	../model/Controller.py	/^class SensorimotorController:$/;"	c	inherits:
+TwoDimensionalGaussianMaker	../utils/gauss_utils.py	/^class TwoDimensionalGaussianMaker:$/;"	c	inherits:
+__call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:MultidimensionalGaussianMaker	file:	access:private
+__call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:OneDimensionalGaussianMaker	file:	access:private
+__call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:OptimizedGaussianMaker	file:	access:private
+__call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma, theta=0) :$/;"	m	class:TwoDimensionalGaussianMaker	file:	access:private
 __init__	../model/Controller.py	/^    def __init__(self) :$/;"	m	class:KinematicActuator	access:public
-__init__	../model/Controller.py	/^    def __init__(self):$/;"	m	class:SensorimotorController	access:public
-__init__	../model/Controller.py	/^    def __init__(self, pixels=[20,20], lims=[[0,1],[0,1]], epsilon=0.2, touch_th = 0.9):$/;"	m	class:PerceptionManager	access:public
+__init__	../model/Controller.py	/^    def __init__(self, pixels, lims):$/;"	m	class:SensorimotorController	access:public
+__init__	../model/Controller.py	/^    def __init__(self, pixels=[20,20], lims=[[0,1],[0,1]], $/;"	m	class:PerceptionManager	access:public
 __init__	../model/GoalMaker.py	/^    def __init__(self):$/;"	m	class:GoalTesterSim	access:public
 __init__	../model/GoalMaker.py	/^    def __init__(self, n_input_layers, n_singlemod_layers, n_hidden_layers, n_out, n_goalrep,singlemod_lrs,$/;"	m	class:GoalMaker	access:public
 __init__	../model/GoalPredictor.py	/^    def __init__(self, n_goal_units, eta) :$/;"	m	class:GoalPredictor	access:public
@@ -38,15 +46,14 @@ __init__	../model/main.py	/^    def __init__(self, app, robot):$/;"	m	class:Kine
 __init__	../nets/esn.py	/^    def __init__($/;"	m	class:ESN	access:public
 __init__	../nets/kohonen.py	/^    def __init__(self,$/;"	m	class:Kohonen	access:public
 __init__	../utils/gauss_utils.py	/^    def __init__(self, lims) :$/;"	m	class:MultidimensionalGaussianMaker	access:public
+__init__	../utils/gauss_utils.py	/^    def __init__(self, lims) :$/;"	m	class:OneDimensionalGaussianMaker	access:public
+__init__	../utils/gauss_utils.py	/^    def __init__(self, lims) :$/;"	m	class:OptimizedGaussianMaker	access:public
+__init__	../utils/gauss_utils.py	/^    def __init__(self, lims) :$/;"	m	class:TwoDimensionalGaussianMaker	access:public
 __init__	../utils/kinematics.py	/^    def __init__(self,$/;"	m	class:Arm	access:public
 abstraction_maps	../model/main.py	/^    abstraction_maps = GoalAbstractionMaps(main_app, robot)$/;"	v
 add_img	../model/main.py	/^    def add_img(self, win, row=None, col=None, $/;"	m	class:GoalAbstractionMaps	access:public
-add_img	../model/main.py	/^    def add_img(self, win, row=None, col=None, $/;"	m	class:GoalSelectionMaps	access:public
-add_plot	../model/main.py	/^    def add_plot(self, win, row=None, col=None, $/;"	m	class:GoalSelectionMaps	access:public
 alpha	../model/test_main.py	/^            alpha = 0.1,$/;"	v
 angle	../utils/kinematics.py	/^    angle = zeros(3)  $/;"	v
-append_img_views	../model/main.py	/^    def append_img_views(self, items=1, row=None, col=None, $/;"	m	class:GoalSelectionMaps	access:public
-append_plot_views	../model/main.py	/^    def append_plot_views(self, items=1, row=None, col=None, $/;"	m	class:GoalSelectionMaps	access:public
 append_views	../model/main.py	/^    def append_views(self, items=1, row=None, col=None, $/;"	m	class:GoalAbstractionMaps	access:public
 arm	../utils/kinematics.py	/^    arm = Arm($/;"	v
 ax	../model/Controller.py	/^    ax = fig.add_subplot(gs[:2,:], aspect="auto")$/;"	v
@@ -80,20 +87,20 @@ external_point	../utils/kinematics.py	/^    external_point = scatter(*point, s= 
 fig	../model/Controller.py	/^    fig = plt.figure(figsize=(8,12))$/;"	v
 fig	../model/test_main.py	/^    fig = plt.figure()$/;"	v
 fig	../utils/kinematics.py	/^    fig = figure("arm")$/;"	v
+from_goal_index	../model/GoalSelector.py	/^    def from_goal_index(self, idx):      $/;"	m	class:GoalSelector	access:public
 g2e_spars	../model/test_main.py	/^            g2e_spars = 0.01,$/;"	v
 gauss2d_oriented	../utils/gauss_utils.py	/^def gauss2d_oriented(x,y,m1,m2,std_x, std_y, theta) :$/;"	f	access:public
 get_angle	../utils/kinematics.py	/^def get_angle(v1,v2) :$/;"	f	access:public
 get_arm_positions	../model/Robot.py	/^    def get_arm_positions(self) :$/;"	m	class:Robot	access:public
 get_dense_chain	../utils/kinematics.py	/^    def get_dense_chain(self, density) :$/;"	m	class:Polychain	access:public
-get_gaussian	../utils/gauss_utils.py	/^    def get_gaussian(self, mu, sigma) :$/;"	m	class:MultidimensionalGaussianMaker	access:public
 get_image	../model/Controller.py	/^    def get_image(self, body_tokens):$/;"	m	class:PerceptionManager	access:public
 get_joint_positions	../utils/kinematics.py	/^    def get_joint_positions(self,  joint_angles  ):$/;"	m	class:Arm	access:public
 get_length	../utils/kinematics.py	/^    def get_length(self) :$/;"	m	class:Polychain	access:public
 get_point	../utils/kinematics.py	/^    def get_point(self, distance) :$/;"	m	class:Polychain	access:public
-get_proprioception	../model/Controller.py	/^    def get_proprioception(self, body_tokens, angles_tokens):$/;"	m	class:PerceptionManager	access:public
+get_proprioception	../model/Controller.py	/^    def get_proprioception(self, angles_tokens):$/;"	m	class:PerceptionManager	access:public
 get_selection_arrays	../model/Robot.py	/^    def get_selection_arrays(self) :$/;"	m	class:Robot	access:public
 get_sensory_arrays	../model/Robot.py	/^    def get_sensory_arrays(self) :$/;"	m	class:Robot	access:public
-get_touch	../model/Controller.py	/^    def get_touch(self, body_tokens, init_body_tokens, body_tokens_sensors):$/;"	m	class:PerceptionManager	access:public
+get_touch	../model/Controller.py	/^    def get_touch(self, body_tokens):$/;"	m	class:PerceptionManager	access:public
 gm	../model/test_main.py	/^    gm = GoalMaker.GoalMaker($/;"	v
 gm_height	../model/test_main.py	/^    gm_height = 1.75$/;"	v
 gm_lt	../model/test_main.py	/^    gm_lt = 1.0$/;"	v

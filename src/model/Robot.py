@@ -16,7 +16,9 @@ class Robot :
 
     def __init__(self) :
     
-        self.controller = Controller.SensorimotorController()
+        self.controller = Controller.SensorimotorController(       
+                pixels = [20, 20],
+                lims = [[-5, 5], [-2, 4.]] )
 
         self.GOAL_NUMBER = 9
 
@@ -31,6 +33,7 @@ class Robot :
                 n_echo_units = 100,
                 n_rout_units = self.controller.actuator.NUMBER_OF_JOINTS*2,
                 im_decay = 0.01,
+                match_decay = 0.4,
                 noise = .5,
                 sm_temp = 0.2,
                 g2e_spars = 0.2,
@@ -51,7 +54,7 @@ class Robot :
                 n_hidden_layers=[16, 16],
                 n_out=16,
                 n_goalrep= self.GOAL_NUMBER,
-                singlemod_lrs = [0.05, 0.05, 0.05],
+                singlemod_lrs = [0.1, 0.1, 0.1],
                 hidden_lrs=[0.01, 0.01],
                 output_lr=0.001,
                 goalrep_lr=0.2,

@@ -17,7 +17,11 @@ def step_fun(x, th):
     return 1.0 * (x > th)
 
 def normalize(x) :
-    return x/np.linalg.norm(x)
+    
+    nrm = np.linalg.norm(x)
+    if nrm > 0:
+        return x/np.linalg.norm(x)
+    return np.zeros(x.shape)
 
 class GoalMaker(object):
     def __init__(self, n_input_layers, n_singlemod_layers, n_hidden_layers, n_out, n_goalrep,singlemod_lrs,
@@ -202,7 +206,7 @@ class GoalMaker(object):
         # UPDATE ACTIVATIONS
 
         # single modality (The activation is multiplied times the highest unit of the som)
-        for n_singlemod in xrange(self.TOT_SINGLEMOD_LAYERS):
+        for n_singlemod in xrange(self.TOT_SINGLEMOD_LAYERS): 
             self.singlemod_layers[n_singlemod] = step_fun(
                 (self.singlemod_soms[n_singlemod].out == 1) *
                 self.singlemod_soms[n_singlemod].out_raw,

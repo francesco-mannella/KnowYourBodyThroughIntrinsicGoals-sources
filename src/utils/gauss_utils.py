@@ -87,13 +87,70 @@ class MultidimensionalGaussianMaker:
         self.ln = self.X.shape[0]
         self.nDim = self.X.shape[1] 
 
-    def get_gaussian(self, mu, sigma) :
+    def __call__(self, mu, sigma) :
          
         e = (self.X - mu).T
         S = np.eye(self.nDim, self.nDim)*(1.0/sigma) 
         y = np.exp( -np.diag(np.dot(e.T, np.dot(S,e) ) ))
 
         return (y, self.X)
+    
+
+
+class TwoDimensionalGaussianMaker:
+
+    def __init__(self, lims) :
+
+        lims = np.vstack(lims) 
+        x = np.linspace(*lims[0])
+        y = np.linspace(*lims[1])
+        self.X, self.Y = np.meshgrid(x,y)
+
+    def __call__(self, mu, sigma, theta=0) :
+
+        sx,sy = sigma
+        mx,my = mu
+        
+        a = (np.cos(theta)**2)/(2*sx**2) +\
+            (np.sin(theta)**2)/(2*sy**2);
+        b = (-np.sin(2*theta))/(4*sx**2) +\
+            (np.sin(2*theta))/(4*sy**2);
+        c = (np.sin(theta)**2)/(2*sx**2) +\
+            (np.cos(theta)**2)/(2*sy**2);
+        
+        res = np.exp( 
+                -a*(self.X-mx)**2 
+                -2*b*(self.X-mx)*(self.Y-my) 
+            -c*(self.Y-my)**2)
+        
+        return res.T.ravel(), [self.X, self.Y]
+
+class OneDimensionalGaussianMaker:
+
+    def __init__(self, lims) :
+        self.x = np.linspace(*lims[0])
+
+    def __call__(self, mu, sigma) :
+
+        return np.exp((-(self.x-mu)**2)/(sigma**2)), self.x
+
+class OptimizedGaussianMaker:
+   
+    def __init__(self, lims) :
+        L = len(lims)
+        self.gm = None
+        if L == 1 :
+            self.gm = OneDimensionalGaussianMaker(lims)
+        elif L == 2:
+            self.gm = TwoDimensionalGaussianMaker(lims)
+        else:
+            self.gm = MultidimensionalGaussianMaker(lims)
+
+    def __call__(self, mu, sigma) :
+
+        return self.gm(mu, sigma)
+
+
 
 def gauss2d_oriented(x,y,m1,m2,std_x, std_y, theta) :
    

@@ -36,7 +36,7 @@ class GoalSelector :
 
     def __init__(self, dt, tau, alpha, epsilon, eta, n_input,
             n_goal_units, n_echo_units, n_rout_units,
-            im_decay, noise, sm_temp, g2e_spars, goal_window, 
+            im_decay, match_decay, noise, sm_temp, g2e_spars, goal_window, 
             reset_window, echo_ampl=1000):
         '''
         :param dt: integration time of the ESN
@@ -49,6 +49,7 @@ class GoalSelector :
         :param n_echo_units: number of units in the ESN
         :param n_rout_units: number of actuators
         :param im_decay: decay of the intrinsic trace
+        :param match_decay: decay of the matching trace
         :param noise: standard deviation of white noise in the actuators
         :param sm_temp: temperature of the softmax
         :param g2e_spars: sparseness of weights form goals to esn
@@ -62,6 +63,7 @@ class GoalSelector :
         self.EPSILON = epsilon
         self.ETA = eta
         self.IM_DECAY = im_decay
+        self.MATCH_DECAY = match_decay
         self.NOISE = noise
         self.SM_TEMP = sm_temp
         self.GOAL_WINDOW = goal_window
@@ -196,7 +198,8 @@ class GoalSelector :
             pos_mean =  self.target_position[goalwin_idx]
             pos =  self.out
             n =  self.target_counter[goalwin_idx] 
-            pos_mean += (1.0/float(n))* (-pos_mean + pos)
+            #pos_mean += (1.0/float(n))* (-pos_mean + pos)
+            pos_mean += (1.0 - self.match_mean[self.goal_win>0])* (-pos_mean + pos)
             self.target_position[goalwin_idx] = pos_mean
         except KeyError: 
             pos =  self.out
@@ -204,7 +207,7 @@ class GoalSelector :
 
 
     def reset(self, match):
-            self.match_mean += self.IM_DECAY*(
+            self.match_mean += self.MATCH_DECAY*(
                     -self.match_mean + match)*self.goal_win
             self.goal_window_counter = 0
             self.reset_window_counter = 0
@@ -236,6 +239,7 @@ class GoalSelector :
         self.inp = self.echonet.out
         self.read_out = np.dot(self.echo2out_w, self.echonet.out)
         self.curr_noise = self.NOISE*(1.0 - self.match_mean[self.goal_win>0])
+        print  self.match_mean.round(3)
         if np.all(self.goal_win==0):
             self.curr_noise = 0.0
  

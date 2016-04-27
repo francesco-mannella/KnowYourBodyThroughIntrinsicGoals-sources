@@ -12,6 +12,7 @@ import os
 from utils.gauss_utils import *
 
 #------------------------------------------------------------
+GaussianMaker = OptimizedGaussianMaker
 
 class Kohonen :  
 
@@ -77,7 +78,7 @@ class Kohonen :
          
         lims = [ [0,self.BINS[x]-1,self.BINS[x]]
                 for x in xrange(self.N_DIM_OUT) ]
-        self.gmaker = MultidimensionalGaussianMaker(lims)
+        self.gmaker = GaussianMaker(lims)
         
         # timing
         self.t = 0
@@ -110,7 +111,7 @@ class Kohonen :
             self.inp = x
             w = self.inp2out_w
             #print y.shape
-            y = np.dot(w,x) -(1/2.)*np.diag(np.dot(w,w.T))
+            y = np.dot(w,x) -0.5*np.diag(np.dot(w,w.T))
 
             # Calculate neighbourhood
             max_index = np.argmax(y) # index of maximum
@@ -119,7 +120,7 @@ class Kohonen :
             # output:
             self.out_raw = y
             point = map1DND(max_index, self.N_DIM_OUT, self.BINS)
-            self.out,_ = self.gmaker.get_gaussian(point,
+            self.out,_ = self.gmaker(point,
                     np.ones(self.N_DIM_OUT)*(curr_neighborhood**2))
         else:
             x = np.zeros(inp.shape)
@@ -134,8 +135,8 @@ class Kohonen :
         x = self.inp
         y = self.out
         w = self.inp2out_w 
+
         w += eta* (np.outer(y,x) -  np.outer(y, np.ones(self.N_INPUT)) *w )
-        
 
     def store(self):
         """ storage """
