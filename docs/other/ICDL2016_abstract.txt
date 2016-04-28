@@ -1,0 +1,5 @@
+﻿Hierarchical goal abstraction for sensorimotor agency 
+
+Newborn children acquire sensorimotor skills and affordances while they interact with the external stimuli that continuously surround them. This development has different stages since the first months of a child's life. Understanding what kind of learning process lies underneath  this  epigenetic acquisition of sensorimotor skills will help to build scalable systems for robotic motor control. 
+We propose a computational model of sensorimotor development  in which the acquisition of motor skills is guided by three learning processes:  1) acquiring new goals, i.e. abstractions of those experienced events that are able to motivate the agent to reproduce them; 2) learning to predict the happening of these goals; 3) learning to produce the motor behaviors that leads to the events represented by the goals. 
+The computational model is used as the controller of a simulated agent in a 2D environment, composed of two kinematic 3DoF arms. Multimodal sensory information (vision, proprioception and touch) is used by the system to form goals and guide skill learning.   
