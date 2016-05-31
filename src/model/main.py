@@ -264,7 +264,7 @@ class GoalAbstractionMaps(pg.GraphicsView):
         width, height = screen_resolution.width(), screen_resolution.height()
          
         self.LEFT = height*(8/20.)
-        self.TOP = height*(2/20.)
+        self.TOP = height*(1.2/20.)
         self.WIDTH = height*(6/20.)
         self.HEIGHT = height*(16/20.)
         
@@ -462,7 +462,7 @@ class GoalSelectionMaps(pg.GraphicsView):
         self.GAP = height*(1.5/20.)
         self.WIDTH = 10*self.GAP
         self.HEIGHT =  height*(16/20.) - 6.35*self.GAP
-        self.TOP =  height*(2/20.)+ 6.35*self.GAP
+        self.TOP =  height*(1.2/20.)+ 6.35*self.GAP
         
         self.setGeometry(self.LEFT, self.TOP, self.WIDTH, self.HEIGHT)
 
@@ -522,7 +522,7 @@ class KinematicsView(QtGui.QWidget):
         width, height = screen_resolution.width(), screen_resolution.height()
          
         self.LEFT = height*(14/20.)
-        self.TOP = height*(2/20.)
+        self.TOP = height*(1.2/20.)
         self.GAP = height*(1.5/20.)
         
         
