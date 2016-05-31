@@ -27,9 +27,11 @@ def oscillator(x, scale, p) :
     
     x = np.array(x)
     p = np.array(p)
-    x = np.outer(x, np.ones(p.shape))
-    
-    return np.cos(p*5*np.pi*(x/scale-p))
+    pam = p[:(p.size/2)]
+    pph = p[(p.size/2):]
+    x = np.outer(x, np.ones(pam.shape))
+
+    return 0.5*np.pi*np.cos(pam*np.pi*(x/scale-pph))
 
 
 class GoalSelector :
@@ -127,7 +129,7 @@ class GoalSelector :
         self.curr_noise = 0.0
 
         self.goal_selected = False
-        self.random_oscil = np.random.rand(self.N_ROUT_UNITS)
+        self.random_oscil = np.random.rand(2*self.N_ROUT_UNITS)
         self.t = 0
 
     def goal_index(self):
@@ -183,7 +185,7 @@ class GoalSelector :
             self.goal_selected = True
 
             self.t = 0
-            self.random_oscil = np.random.rand(self.N_ROUT_UNITS)
+            self.random_oscil = np.random.rand(2*self.N_ROUT_UNITS)
 
 
     def update_target(self):
@@ -238,17 +240,15 @@ class GoalSelector :
 
         self.inp = self.echonet.out
         self.read_out = np.dot(self.echo2out_w, self.echonet.out)
-        self.curr_noise = self.NOISE*(1.0 - self.match_mean[self.goal_win>0])
+        curr_match = np.squeeze(self.match_mean[self.goal_win>0])
         print  self.match_mean.round(3)
+        print curr_match
         if np.all(self.goal_win==0):
-            self.curr_noise = 0.0
+            curr_match = 0.0
  
-        added_signal = self.curr_noise*oscillator(self.t, 30, self.random_oscil)[0]
-        self.out = self.read_out + added_signal 
-
-        self.out = np.maximum(0,np.minimum(1, self.out))
+        added_signal = self.NOISE*oscillator(self.t, 10, self.random_oscil)[0]
+        self.out = self.read_out + (1.0 - curr_match)*added_signal 
         self.tout = self.read_out 
-        self.tout = np.maximum(0,np.minimum(1, self.tout))
         
         self.t += 1
 

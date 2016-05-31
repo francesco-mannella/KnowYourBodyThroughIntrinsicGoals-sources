@@ -18,7 +18,8 @@ class Robot :
     
         self.controller = Controller.SensorimotorController(       
                 pixels = [20, 20],
-                lims = [[-5, 5], [-2, 4.]] )
+                lims = [[-5, 5], [-2, 4.]],
+                touch_th = 0.8 )
 
         self.GOAL_NUMBER = 9
 
@@ -32,8 +33,8 @@ class Robot :
                 n_goal_units = self.GOAL_NUMBER,
                 n_echo_units = 100,
                 n_rout_units = self.controller.actuator.NUMBER_OF_JOINTS*2,
-                im_decay = 0.01,
-                match_decay = 0.4,
+                im_decay = 0.05,
+                match_decay = 0.5,
                 noise = .5,
                 sm_temp = 0.2,
                 g2e_spars = 0.2,
@@ -54,10 +55,10 @@ class Robot :
                 n_hidden_layers=[16, 16],
                 n_out=16,
                 n_goalrep= self.GOAL_NUMBER,
-                singlemod_lrs = [0.1, 0.1, 0.1],
-                hidden_lrs=[0.01, 0.01],
+                singlemod_lrs = [0.01, 0.01, 0.01],
+                hidden_lrs=[0.005, 0.005],
                 output_lr=0.001,
-                goalrep_lr=0.2,
+                goalrep_lr=0.08,
                 goal_th=0.1
             )
 
@@ -111,42 +112,44 @@ class Robot :
         
         sel = self.gs.goal_selected
         
-        real = np.pi*self.gs.out
-        self.controller.actuator.set_angles(
-                real[:(self.gs.N_ROUT_UNITS/2)],
-                real[(self.gs.N_ROUT_UNITS/2):]
-                )
+        # real = np.pi*self.gs.out
+        # self.controller.actuator.set_angles(
+        #         real[:(self.gs.N_ROUT_UNITS/2)],
+        #         real[(self.gs.N_ROUT_UNITS/2):]
+        #         )
         real_l_pos = self.controller.actuator.position_l
         real_r_pos = self.controller.actuator.position_r
+        
         real_l_pos *= sel
         real_r_pos *= sel
 
         try:    
             goalwin_idx = self.gs.goal_index()
             target = np.pi*self.gs.target_position[goalwin_idx]
-            self.controller.actuator.set_angles(
+            self.controller.target_actuator.set_angles(
                     target[:(self.gs.N_ROUT_UNITS/2)],
                     target[(self.gs.N_ROUT_UNITS/2):],
                     )
-            target_l_pos = self.controller.actuator.position_l
-            target_r_pos = self.controller.actuator.position_r
+            target_l_pos = self.controller.target_actuator.position_l
+            target_r_pos = self.controller.target_actuator.position_r
         except KeyError:
-            target_l_pos = self.controller.actuator.position_l*0
-            target_r_pos = self.controller.actuator.position_r*0
+            target_l_pos = self.controller.target_actuator.position_l*0
+            target_r_pos = self.controller.target_actuator.position_r*0
         target_l_pos *= sel
         target_r_pos *= sel
 
         theoric = np.pi*self.gs.tout
-        self.controller.actuator.set_angles(
+        self.controller.theoric_actuator.set_angles(
                 theoric[:(self.gs.N_ROUT_UNITS/2)],
                 theoric[(self.gs.N_ROUT_UNITS/2):]
                 )
-        theor_l_pos = self.controller.actuator.position_l
-        theor_r_pos = self.controller.actuator.position_r
+        theor_l_pos = self.controller.theoric_actuator.position_l
+        theor_r_pos = self.controller.theoric_actuator.position_r
 
+        sensors = self.controller.perc.sensors * sel
 
         return (real_l_pos, real_r_pos, target_l_pos,
-                target_r_pos, theor_l_pos, theor_r_pos)
+                target_r_pos, theor_l_pos, theor_r_pos, sensors)
 
     def step(self) :
    

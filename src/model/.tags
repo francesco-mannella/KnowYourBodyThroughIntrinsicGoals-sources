@@ -6,6 +6,7 @@
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 Arm	../utils/kinematics.py	/^class Arm:$/;"	c	inherits:
 ESN	../nets/esn.py	/^class ESN(object):$/;"	c	inherits:object
+ETA	../nets/esn.py	/^    ETA = 50000.0$/;"	v
 GaussianMaker	../nets/kohonen.py	/^GaussianMaker = OptimizedGaussianMaker$/;"	v
 GoalAbstractionMaps	../model/main.py	/^class GoalAbstractionMaps(pg.GraphicsView):$/;"	c	inherits:pg.GraphicsView
 GoalMaker	../model/GoalMaker.py	/^class GoalMaker(object):$/;"	c	inherits:object
@@ -20,19 +21,21 @@ Kohonen	../nets/kohonen.py	/^class Kohonen :  $/;"	c	inherits:
 Main	../model/main.py	/^class Main(QtGui.QWidget):$/;"	c	inherits:QtGui.QWidget
 MultidimensionalGaussianMaker	../utils/gauss_utils.py	/^class MultidimensionalGaussianMaker:$/;"	c	inherits:
 N	../nets/esn.py	/^    N = 200$/;"	v
+N_OUT	../nets/esn.py	/^    N_OUT = 2$/;"	v
 OneDimensionalGaussianMaker	../utils/gauss_utils.py	/^class OneDimensionalGaussianMaker:$/;"	c	inherits:
 OptimizedGaussianMaker	../utils/gauss_utils.py	/^class OptimizedGaussianMaker:$/;"	c	inherits:
 PerceptionManager	../model/Controller.py	/^class PerceptionManager:$/;"	c	inherits:
 Polychain	../utils/kinematics.py	/^class Polychain :$/;"	c	inherits:
 Robot	../model/Robot.py	/^class Robot :$/;"	c	inherits:
 SensorimotorController	../model/Controller.py	/^class SensorimotorController:$/;"	c	inherits:
+TRIALS	../nets/esn.py	/^    TRIALS = 200 $/;"	v
 TwoDimensionalGaussianMaker	../utils/gauss_utils.py	/^class TwoDimensionalGaussianMaker:$/;"	c	inherits:
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:MultidimensionalGaussianMaker	file:	access:private
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:OneDimensionalGaussianMaker	file:	access:private
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:OptimizedGaussianMaker	file:	access:private
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma, theta=0) :$/;"	m	class:TwoDimensionalGaussianMaker	file:	access:private
 __init__	../model/Controller.py	/^    def __init__(self) :$/;"	m	class:KinematicActuator	access:public
-__init__	../model/Controller.py	/^    def __init__(self, pixels, lims):$/;"	m	class:SensorimotorController	access:public
+__init__	../model/Controller.py	/^    def __init__(self, pixels, lims, touch_th):$/;"	m	class:SensorimotorController	access:public
 __init__	../model/Controller.py	/^    def __init__(self, pixels=[20,20], lims=[[0,1],[0,1]], $/;"	m	class:PerceptionManager	access:public
 __init__	../model/GoalMaker.py	/^    def __init__(self):$/;"	m	class:GoalTesterSim	access:public
 __init__	../model/GoalMaker.py	/^    def __init__(self, n_input_layers, n_singlemod_layers, n_hidden_layers, n_out, n_goalrep,singlemod_lrs,$/;"	m	class:GoalMaker	access:public
@@ -59,6 +62,8 @@ arm	../utils/kinematics.py	/^    arm = Arm($/;"	v
 ax	../model/Controller.py	/^    ax = fig.add_subplot(gs[:2,:], aspect="auto")$/;"	v
 ax	../model/test_main.py	/^    ax = fig.add_subplot(111,aspect="equal")$/;"	v
 ax	../utils/kinematics.py	/^    ax = fig.add_subplot(111)$/;"	v
+ax1	../nets/esn.py	/^    ax1 = fig.add_subplot(211)$/;"	v
+ax2	../nets/esn.py	/^    ax2 = fig.add_subplot(212)$/;"	v
 axes	../model/Controller.py	/^    axes = []$/;"	v
 chain	../model/test_main.py	/^    chain = KM.Polychain()$/;"	v
 changeValue	../model/main.py	/^    def changeValue(self, value):$/;"	m	class:Main	access:public
@@ -73,11 +78,12 @@ color	../model/test_main.py	/^            color=[.8,.6,.6],$/;"	v
 color	../model/test_main.py	/^            color=[.8,.8,.8],$/;"	v
 controller	../model/Controller.py	/^    controller = SensorimotorController()$/;"	v
 controller	../model/test_main.py	/^    controller = Controller.SensorimotorController()$/;"	v
-controller	../nets/esn.py	/^    controller = ESN($/;"	v
-dense_points	../utils/kinematics.py	/^    dense_points = scatter(*zeros([2,25]), s= 20, c="green") # plot arm edges$/;"	v
+dense_points	../utils/kinematics.py	/^    dense_points = scatter(*zeros([2,25]), s= 20, c=[1,1,0]) # plot arm edges$/;"	v
 dt	../model/test_main.py	/^            dt = 0.001,$/;"	v
 dtype	../model/main.py	/^            dtype=np.ubyte)$/;"	v	class:GoalAbstractionMaps
 dtype	../model/main.py	/^            dtype=np.ubyte)$/;"	v	class:GoalSelectionMaps
+echo	../nets/esn.py	/^    echo = ESN($/;"	v
+echo_activity	../nets/esn.py	/^    echo_activity = ax2.imshow(np.zeros([echo.STIME, N]),$/;"	v
 edges	../utils/kinematics.py	/^    edges = ax.scatter(*pos.T) # plot arm edges$/;"	v
 epsilon	../model/test_main.py	/^            epsilon = 1.0e-10,$/;"	v
 eta	../model/test_main.py	/^            eta = 0.01$/;"	v
@@ -86,6 +92,7 @@ evaluate_rho	../nets/esn.py	/^def evaluate_rho(m):$/;"	f	access:public
 external_point	../utils/kinematics.py	/^    external_point = scatter(*point, s= 30, c="r") # plot arm edges$/;"	v
 fig	../model/Controller.py	/^    fig = plt.figure(figsize=(8,12))$/;"	v
 fig	../model/test_main.py	/^    fig = plt.figure()$/;"	v
+fig	../nets/esn.py	/^    fig = plt.figure(figsize=(5,10))$/;"	v
 fig	../utils/kinematics.py	/^    fig = figure("arm")$/;"	v
 from_goal_index	../model/GoalSelector.py	/^    def from_goal_index(self, idx):      $/;"	m	class:GoalSelector	access:public
 g2e_spars	../model/test_main.py	/^            g2e_spars = 0.01,$/;"	v
@@ -137,8 +144,10 @@ im_value	../model/test_main.py	/^    im_value = 0.0$/;"	v
 image_default	../model/Controller.py	/^    image_default = np.zeros([20, 20])$/;"	v
 imgs	../model/Controller.py	/^    imgs = []$/;"	v
 inp_dim	../model/test_main.py	/^    inp_dim = controller.pixels[0]*controller.pixels[1]$/;"	v
+inp_w	../nets/esn.py	/^    inp_w = 0.5*np.ones([N, l_target])*(np.random.rand(N, l_target)<0.1)$/;"	v
 isPointInChain	../utils/kinematics.py	/^    def isPointInChain(self, point, epsilon = 0.1 ) :$/;"	m	class:Polychain	access:public
 kin	../model/main.py	/^    kin = KinematicsView(main_app, robot)$/;"	v
+l_target	../nets/esn.py	/^    l_target = len(target)$/;"	v
 larm_angles	../model/test_main.py	/^                larm_angles=np.pi*gs.out[:(gs.N_ROUT_UNITS\/2)],$/;"	v
 learn	../model/GoalMaker.py	/^    def learn(self):$/;"	m	class:GoalMaker	access:public
 learn	../model/GoalPredictor.py	/^    def learn(self, match):$/;"	m	class:GoalPredictor	access:public
@@ -199,24 +208,34 @@ reset	../model/Controller.py	/^    def reset(self) :$/;"	m	class:KinematicActuat
 reset	../model/Controller.py	/^    def reset(self):$/;"	m	class:SensorimotorController	access:public
 reset	../model/GoalSelector.py	/^    def reset(self, match):$/;"	m	class:GoalSelector	access:public
 reset	../nets/esn.py	/^    def reset(self):$/;"	m	class:ESN	access:public
+resetWindow	../model/main.py	/^    def resetWindow(self):$/;"	m	class:GoalAbstractionMaps	access:public
+resetWindow	../model/main.py	/^    def resetWindow(self):$/;"	m	class:GoalSelectionMaps	access:public
+resetWindow	../model/main.py	/^    def resetWindow(self):$/;"	m	class:KinematicsView	access:public
 reset_data	../nets/esn.py	/^    def reset_data(self):$/;"	m	class:ESN	access:public
 reset_data	../nets/kohonen.py	/^    def reset_data(self):$/;"	m	class:Kohonen	access:public
 reset_window	../model/test_main.py	/^            reset_window = 4$/;"	v
 reshape_coupled_weights	../model/main.py	/^def reshape_coupled_weights(w):$/;"	f	access:public
 reshape_weights	../model/main.py	/^def reshape_weights(w):$/;"	f	access:public
+ro_d	../nets/esn.py	/^    ro_d = np.zeros([echo.STIME, N_OUT])$/;"	v
+ro_w	../nets/esn.py	/^    ro_w = 0.01*np.random.randn(N_OUT,N)$/;"	v
 robot	../model/main.py	/^    robot = Robot()$/;"	v
+rout	../nets/esn.py	/^    rout = np.zeros(N_OUT)$/;"	v
+rout_mean	../nets/esn.py	/^    rout_mean = np.zeros(N_OUT)$/;"	v
+rout_real	../nets/esn.py	/^    rout_real = np.zeros(N_OUT) $/;"	v
 run_colors	../nets/kohonen_colors.py	/^def run_colors() :     $/;"	f	access:public
 rwl	../model/test_main.py	/^    rwl = ts*gs.RESET_WINDOW$/;"	v
 scaled_grid	../utils/gauss_utils.py	/^def scaled_grid(idcs, lims) :$/;"	f	access:public
 selection_maps	../model/main.py	/^    selection_maps = GoalSelectionMaps(main_app, robot)$/;"	v
 set_angles	../model/Controller.py	/^    def set_angles(self, angles_l, angles_r) :$/;"	m	class:KinematicActuator	access:public
 set_chain	../utils/kinematics.py	/^    def set_chain(self, chain) :$/;"	m	class:Polychain	access:public
+sigma	../nets/esn.py	/^    sigma = 0.6$/;"	v
 singlemod_lrs	../model/test_main.py	/^            singlemod_lrs = [0.3, 0.3, 0.3],$/;"	v
 skin_region	../model/test_main.py	/^            skin_region = [1e10,1e10]$/;"	v
 sm_temp	../model/test_main.py	/^            sm_temp = 0.2,$/;"	v
 softmax	../model/GoalSelector.py	/^def softmax(x, t=0.1):$/;"	f	access:public
 start	../model/main.py	/^    def start(self) :$/;"	m	class:GoalAbstractionMaps	access:public
 start	../model/main.py	/^    def start(self) :$/;"	m	class:GoalSelectionMaps	access:public
+start	../model/main.py	/^    def start(self) :$/;"	m	class:KinematicsView	access:public
 static_inp	../model/test_main.py	/^                static_inp = np.random.rand(*static_inp.shape)$/;"	v
 step	../model/Controller.py	/^    def step(self, larm_delta_angles, rarm_delta_angles):$/;"	m	class:SensorimotorController	access:public
 step	../model/GoalMaker.py	/^    def step(self, raw_inputs):$/;"	m	class:GoalMaker	access:public
@@ -236,6 +255,7 @@ store	../model/GoalMaker.py	/^    def store(self):$/;"	m	class:GoalMaker	access:
 store	../nets/esn.py	/^    def store(self, tt):$/;"	m	class:ESN	access:public
 store	../nets/kohonen.py	/^    def store(self):$/;"	m	class:Kohonen	access:public
 target	../model/test_main.py	/^    target = (0.98, 0.78)$/;"	v
+target	../nets/esn.py	/^    target = np.array( [$/;"	v
 target_angles	../model/test_main.py	/^                target_angles = gs.target_position[goalwin_idx]$/;"	v
 tau	../model/test_main.py	/^            tau = 0.08,$/;"	v
 timerEvent	../model/main.py	/^    def timerEvent(self, event):$/;"	m	class:GoalAbstractionMaps	access:public

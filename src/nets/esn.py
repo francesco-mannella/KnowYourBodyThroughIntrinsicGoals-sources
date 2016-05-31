@@ -28,6 +28,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import numpy as np
 import math
+import time
 
 
 def evaluate_rho(m):
@@ -259,11 +260,18 @@ class ESN(object):
 
 if __name__ == "__main__":
 
-    N = 200
+    import matplotlib.pyplot as plt
+    
+    plt.ion()
 
-    controller = ESN(
+    N = 200
+    N_OUT = 2
+    TRIALS = 200 
+    ETA = 50000.0
+
+    echo = ESN(
         N       = N,
-        stime   = 40,
+        stime   = 200,
         dt      = 1.0,
         tau     = 20.0,
         alpha   = 0.1,
@@ -271,34 +279,99 @@ if __name__ == "__main__":
         epsilon = 1.0e-5
         )
 
-    for t in xrange(controller.STIME) :
-        inp = np.zeros(N)
-        if t==0:
-            inp = np.random.randn(N)
-        controller.step(inp)
-        controller.store(t)
-
-
-    try:
-        import matplotlib.pyplot as plt
-        # activity
-        fig = plt.figure(figsize=(12,4))
-        ax = fig.add_subplot(121)
-        x = controller.data[controller.out_lab].T
-        pl = ax.plot(x)
-
-        # spectrogram
-        ax = fig.add_subplot(122)
-        l = np.linalg.eigvals(controller.w)
-        sr = np.max(np.abs(l))
-        sc = ax.scatter(np.real(l), np.imag(l))
-        ax.set_xlim([-sr,sr])
-        ax.set_ylim([-sr,sr])
-        plt.show()
-    except:
-        pass
-
-    np.savetxt("data", controller.data[controller.out_lab].T)
-
-
+    ro_w = 0.01*np.random.randn(N_OUT,N)
     
+    ro_d = np.zeros([echo.STIME, N_OUT])
+
+    target = np.array( [
+        [0.5, 0.25],
+        [0.5, 0.5 ],
+        [0.25,0.5 ],
+        [0.25,0.25]])
+
+
+    fig = plt.figure(figsize=(5,10))
+    ax1 = fig.add_subplot(211)
+    ax2 = fig.add_subplot(212)
+
+    ax1.scatter(*np.array(target).T, s=50, color="red")
+    line, = ax1.plot(0,0)
+    start, = ax1.plot(0,0,marker="o", mfc="blue")
+    end, = ax1.plot(0,0, ms= 15, marker="o", mfc="green")
+    ax1.set_xlim([0,1.5])
+    ax1.set_ylim([0,1.5])
+    
+    echo_activity = ax2.imshow(np.zeros([echo.STIME, N]),
+            interpolation='none', aspect='auto', vmin=0, vmax=1)
+   
+    
+    l_target = len(target)
+
+    inp_w = 0.5*np.ones([N, l_target])*(np.random.rand(N, l_target)<0.1)
+    sigma = 0.6
+    rout = np.zeros(N_OUT)
+    rout_mean = np.zeros(N_OUT)
+   
+    rout_real = np.zeros(N_OUT) 
+    for k in xrange(TRIALS) :
+        for t in xrange(echo.STIME) :
+            
+            mask = np.zeros(l_target)
+            for i in range(l_target) :
+                if  echo.STIME*(i/float(l_target)) <= t \
+                        < echo.STIME*((i+1)/float(l_target)) :
+                    mask[i] = 1
+
+            dist = np.linalg.norm(target - rout_real, axis=1) 
+            inp = np.exp(-(dist**2)/(2*sigma**2))*mask
+            
+            echo.step(np.dot(inp_w, inp))
+            echo.store(t)
+        
+            rout = echo.out[:N_OUT] 
+            rout_real = rout + 0.5*np.random.rand(2)
+            rout_mean += 0.1*(rout_real - rout_mean)
+            ro_d[t] = rout_real
+           
+            if k < TRIALS/2 :
+                w = echo.w[:N_OUT,:]
+                # tg_idx = np.where(inp == max(inp))
+                # tg = target[tg_idx]
+                rew = sum(inp>0.1)
+                w += ETA*rew*np.outer(rout - rout_mean, echo.out) 
+           
+        line.set_data(*ro_d.T)
+        start.set_data(*ro_d[0])
+        end.set_data(*ro_d[-1])
+        echo_activity.set_array(echo.data[echo.out_lab])
+        fig.canvas.draw()
+        plt.pause(.001)
+
+    raw_input("press for single test")
+
+    for t in xrange(echo.STIME) :
+                
+        mask = np.zeros(l_target)
+        for i in range(l_target) :
+            if  echo.STIME*(i/float(l_target)) <= t \
+                    < echo.STIME*((i+1)/float(l_target)) :
+                mask[i] = 1
+
+        dist = np.linalg.norm(target - rout, axis=1) 
+        inp = np.exp(-(dist**2)/(2*sigma**2))*mask
+        
+        echo.step(np.dot(inp_w, inp))
+        echo.store(t)
+    
+        rout = echo.out[:N_OUT] 
+        ro_d[t] = rout
+        
+        line.set_data(*ro_d[:t].T)
+        start.set_data(*ro_d[0])
+        end.set_data(*ro_d[t-1])
+        echo_activity.set_array(echo.data[echo.out_lab][:,:t])
+        fig.canvas.draw()
+        plt.pause(.01)
+ 
+    raw_input("press to end")
+

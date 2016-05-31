@@ -412,7 +412,7 @@ class GoalSelectionMaps(pg.GraphicsView):
         
         self.resetWindow()
 
-	self.setWindowTitle("Maps")
+	self.setWindowTitle("Selection and control")
                
         layout = pg.GraphicsLayout(border=pg.mkPen({'color':'300','width':2}))
         self.setCentralItem(layout)  
@@ -459,9 +459,10 @@ class GoalSelectionMaps(pg.GraphicsView):
         width, height = screen_resolution.width(), screen_resolution.height()
          
         self.LEFT = height*(14/20.)
-        self.TOP = height*(8/20.)
-        self.WIDTH = height*(15/20.)
-        self.HEIGHT = height*(10/20.)
+        self.GAP = height*(1.5/20.)
+        self.WIDTH = 10*self.GAP
+        self.HEIGHT =  height*(16/20.) - 6.35*self.GAP
+        self.TOP =  height*(2/20.)+ 6.35*self.GAP
         
         self.setGeometry(self.LEFT, self.TOP, self.WIDTH, self.HEIGHT)
 
@@ -522,7 +523,7 @@ class KinematicsView(QtGui.QWidget):
          
         self.LEFT = height*(14/20.)
         self.TOP = height*(2/20.)
-        self.GAP = height*(1/20.)
+        self.GAP = height*(1.5/20.)
         
         
         self.WINDOW_BOTTOM = -2.0 
@@ -575,7 +576,7 @@ class KinematicsView(QtGui.QWidget):
 
         (real_l_pos, real_r_pos, target_l_pos,
                 target_r_pos, theor_l_pos, 
-                theor_r_pos) = self.robot.get_arm_positions()
+                theor_r_pos, sensors) = self.robot.get_arm_positions()
 
         
         def paint_arm(curr_pos, curr_color, curr_width):
@@ -617,8 +618,37 @@ class KinematicsView(QtGui.QWidget):
            
         curr_pos = real_r_pos
         paint_arm(curr_pos, curr_color, curr_width)
+        
+        
+        if self.robot.gs.goal_selected :
+            curr_pos = np.vstack([theor_l_pos[0], real_r_pos[0]])
+            paint_arm(curr_pos, curr_color, curr_width)
+               
+        # paint sensors
+        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
+        painter.setBrush(curr_color)  
+        curr_width = .4
+        for sensor in sensors :
+            x,y  = sensor 
+            painter.drawEllipse(QtCore.QRectF(
+                x - self.DOT_RADIUS*curr_width, 
+                y - self.DOT_RADIUS*curr_width, 
+                self.DOT_RADIUS*2*curr_width, 
+                self.DOT_RADIUS*2*curr_width)) 
+        
+        curr_color = QtGui.QColor(255,255,0)
+        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
+        painter.setBrush(curr_color)  
+        curr_width = .3   
+        for sensor in sensors :
+            x,y  = sensor 
+            painter.drawEllipse(QtCore.QRectF(
+                x - self.DOT_RADIUS*curr_width, 
+                y - self.DOT_RADIUS*curr_width, 
+                self.DOT_RADIUS*2*curr_width, 
+                self.DOT_RADIUS*2*curr_width)) 
+       
 
-    
     def timerEvent(self,event):
         
         self.update()

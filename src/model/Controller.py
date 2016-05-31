@@ -25,12 +25,17 @@ class PerceptionManager:
         self.bins = self.size/self.pixels
         self.chain = KM.Polychain()
         self.init_chains = []
-        self.sigma =  self.size*0.3
-        self.sigma[0] *=  0.4
+        self.touch_sigma =  .5 
+        self.sigma =  self.size*0.1
+        self.sigma[0] *=  0.2
         self.gm = GM(lims = np.hstack([self.lims,self.pixels.reshape(2,1)]))
         self.touch_sensors = 2
         self.touch_th = touch_th
 
+        self.chain.set_chain(np.vstack(([-1,0],[1,0])))
+        self.sensors = self.chain.get_dense_chain(self.touch_sensors)       
+       
+      
     
     def get_image(self, body_tokens):
 
@@ -45,10 +50,6 @@ class PerceptionManager:
             image /= float(len(point))
         image /= float(len(body_tokens))
         
-        if np.any(np.isinf(image)): 
-            print "vis nan"
-            raw_input()
-
         return image.T
 
     def get_proprioception(self, angles_tokens):
@@ -64,10 +65,6 @@ class PerceptionManager:
                 g = self.gm(point, sigma)[0]
                 image += g.reshape(*self.pixels)*angle
         
-        if np.any(np.isinf(image)): 
-            print "prop nan"
-            raw_input()
-              
         return image.T
 
     def get_touch(self, body_tokens):
@@ -75,28 +72,28 @@ class PerceptionManager:
         image = np.zeros(self.pixels)
         
         bts = np.vstack(body_tokens)
-        self.chain.set_chain( bts[[0,-1],:])
+        self.chain.set_chain( bts )
+        self.sensors = self.chain.get_dense_chain(self.touch_sensors)   
+        length = len(self.sensors) 
+        touches = np.zeros(length)
+        for x,sensor  in zip(range(length), self.sensors):
+            for y,point in  zip(range(length), self.sensors):
+                if abs(x - y) > length/4:
+                    touches[x] += \
+                    np.exp(-((np.linalg.norm(point - sensor))**2)/\
+                            (2*self.touch_sigma**2)  )
+        tabs = touches 
+        touches  = np.tanh(touches) 
+
         
-        sensor_bt = self.chain.get_dense_chain(self.touch_sensors)       
-        
-        touches = np.zeros(len(bts))
-        for sensor  in sensor_bt:
-            for x,point in  zip(range(len(bts)),bts) :
-                touches[x] += np.exp(-((np.linalg.norm(point - sensor))**2) )
-       
-        touches /= float(len(sensor_bt))
         lims = np.hstack([self.lims, len(touches)*np.ones([2,1]) ])
         abs_body_tokens = np.vstack([ np.linspace(*lims[0]), 
-            self.ycenter*np.ones(len(touches))]).T
+            self.ycenter*np.ones(length)]).T
     
         for touch,point in  zip(touches, abs_body_tokens) :
-            g = self.gm(point, 0.4*touch*self.sigma**2 )[0]
+            g = self.gm(point, 2.*touch*self.sigma**2 )[0]
             image += g.reshape(*self.pixels)*(touch>self.touch_th)
          
-        if np.any(np.isinf(image)): 
-            print "touch nan"
-            raw_input()
-  
         return image.T
 
 #-----------------------------------------------------------------------------
@@ -161,12 +158,14 @@ class KinematicActuator :
 
 class SensorimotorController:
 
-    def __init__(self, pixels, lims):
+    def __init__(self, pixels, lims, touch_th):
 
         self.pixels = pixels 
         self.lims = lims
 
         self.actuator = KinematicActuator()
+        self.theoric_actuator = KinematicActuator()
+        self.target_actuator = KinematicActuator()
 
         n_joints = self.actuator.NUMBER_OF_JOINTS
         self.larm_angles = np.zeros(n_joints)
@@ -188,15 +187,20 @@ class SensorimotorController:
 
         self.actuator.set_angles(np.array([0., 0, 0]),
                              np.array([0., 0, 0]))
-        self.init_body_tokens = (self.actuator.position_l,        
+        self.theoric_actuator.set_angles(np.array([0., 0, 0]),
+                             np.array([0., 0, 0]))   
+        self.target_actuator.set_angles(np.array([0., 0, 0]),
+                             np.array([0., 0, 0])) 
+        
+        self.init_body_tokens = (self.actuator.position_l[::-1],        
                                  self.actuator.position_r)
         
         self.perc = PerceptionManager(pixels=self.pixels,
-                lims=self.lims,  epsilon=0.1)
+                lims=self.lims,  epsilon=0.1, touch_th=touch_th)
 
     def step(self, larm_delta_angles, rarm_delta_angles):
 
-        self.larm_delta_angles = larm_delta_angles
+        self.larm_delta_angles = larm_delta_angles[::-1]
         self.rarm_delta_angles = rarm_delta_angles
         self.larm_angles += larm_delta_angles
         self.rarm_angles += rarm_delta_angles
@@ -237,7 +241,7 @@ class SensorimotorController:
 
         self.larm_delta_angles = larm_angles - self.larm_angles
         self.rarm_delta_angles = rarm_angles - self.rarm_angles
-        self.larm_angles = larm_angles
+        self.larm_angles = larm_angles[::-1]
         self.rarm_angles = rarm_angles
 
 
@@ -246,8 +250,9 @@ class SensorimotorController:
                 self.actuator.angles_r)
 
         # VISUAL POSITION
-        curr_body_tokens = (self.actuator.position_l, 
+        curr_body_tokens = (self.actuator.position_l[::-1], 
                 self.actuator.position_r)
+
         self.pos = self.perc.get_image(body_tokens=curr_body_tokens)
         self.pos_delta = self.pos - self.pos_old
 
