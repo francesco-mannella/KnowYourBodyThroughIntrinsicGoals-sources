@@ -108,6 +108,9 @@ class TwoDimensionalGaussianMaker:
 
     def __call__(self, mu, sigma, theta=0) :
 
+        if np.isscalar(sigma) == 1 :
+            sigma = [sigma,sigma]
+
         sx,sy = sigma
         mx,my = mu
         

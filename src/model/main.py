@@ -469,7 +469,7 @@ class GoalSelectionMaps(pg.GraphicsView):
     def timerEvent(self, event):
         
         (gmask, gv, gw, gr,targets, esn_data) = self.robot.get_selection_arrays() 
-        
+     
         raw_gw = np.sqrt(len(gw))
         self.plot1.setImage( 0.6*gw.reshape(raw_gw, raw_gw) 
                 +0.4*gr.reshape(raw_gw, raw_gw) , levels=(0,1) )
@@ -564,6 +564,35 @@ class KinematicsView(QtGui.QWidget):
                 self.WINDOW_WIDTH, 
                 self.WINDOW_HEIGHT)  
 
+        (real_l_pos, real_r_pos, target_l_pos,
+                target_r_pos, theor_l_pos, 
+                theor_r_pos, sensors, eye_pos, 
+                fovea_radius) = self.robot.get_arm_positions()
+
+        # paint arm position
+        curr_width = fovea_radius/self.DOT_RADIUS
+        curr_color = QtGui.QColor(255,230,100)
+        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
+        painter.setBrush(curr_color)  
+        x,y  = eye_pos 
+        painter.drawEllipse(QtCore.QRectF(
+            x - self.DOT_RADIUS*curr_width, 
+            y - self.DOT_RADIUS*curr_width, 
+            self.DOT_RADIUS*2*curr_width, 
+            self.DOT_RADIUS*2*curr_width)) 
+        
+        # paint eye position
+        curr_width = 0.5  
+        curr_color = QtGui.QColor(55,55,0)
+        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
+        painter.setBrush(curr_color)  
+        x,y  = eye_pos 
+        painter.drawEllipse(QtCore.QRectF(
+            x - self.DOT_RADIUS*curr_width, 
+            y - self.DOT_RADIUS*curr_width, 
+            self.DOT_RADIUS*2*curr_width, 
+            self.DOT_RADIUS*2*curr_width)) 
+
         # paint axes
         painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.black), 
             self.AXIS_LINE_WIDTH, QtCore.Qt.DashLine)) 
@@ -571,13 +600,7 @@ class KinematicsView(QtGui.QWidget):
                 self.WINDOW_LEFT+self.WINDOW_WIDTH,0) 
         painter.drawLine( 0, self.WINDOW_BOTTOM, 
                 0, self.WINDOW_BOTTOM+self.WINDOW_HEIGHT) 
-      
-
-        (real_l_pos, real_r_pos, target_l_pos,
-                target_r_pos, theor_l_pos, 
-                theor_r_pos) = self.robot.get_arm_positions()
-
-        
+         
         def paint_arm(curr_pos, curr_color, curr_width):
             painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
             painter.setBrush(curr_color) 
@@ -617,8 +640,37 @@ class KinematicsView(QtGui.QWidget):
            
         curr_pos = real_r_pos
         paint_arm(curr_pos, curr_color, curr_width)
+        
+        
+        if self.robot.gs.goal_selected :
+            curr_pos = np.vstack([theor_l_pos[0], real_r_pos[0]])
+            paint_arm(curr_pos, curr_color, curr_width)
+               
+        # paint sensors
+        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
+        painter.setBrush(curr_color)  
+        curr_width = .4
+        for sensor in sensors :
+            x,y  = sensor 
+            painter.drawEllipse(QtCore.QRectF(
+                x - self.DOT_RADIUS*curr_width, 
+                y - self.DOT_RADIUS*curr_width, 
+                self.DOT_RADIUS*2*curr_width, 
+                self.DOT_RADIUS*2*curr_width)) 
+        
+        curr_color = QtGui.QColor(255,255,0)
+        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
+        painter.setBrush(curr_color)  
+        curr_width = .3   
+        for sensor in sensors :
+            x,y  = sensor 
+            painter.drawEllipse(QtCore.QRectF(
+                x - self.DOT_RADIUS*curr_width, 
+                y - self.DOT_RADIUS*curr_width, 
+                self.DOT_RADIUS*2*curr_width, 
+                self.DOT_RADIUS*2*curr_width)) 
 
-    
+
     def timerEvent(self,event):
         
         self.update()

@@ -212,13 +212,6 @@ if __name__ == "__main__":
                 controller.touch_delta.ravel()*5000.0])
 
             gm.learn()
-        
-        # print np.array([sum(x) for x in gm.input_layers]).round(2)
-        # print np.array([sum(x) for x in gm.singlemod_layers]).round(2)
-        # print np.array([sum(x) for x in gm.hidden_layers]).round(2)
-        # print np.array([sum(gm.output_layer)]).round(2)
-        # print np.array([sum(gm.goalrep_layer)]).round(2)
-        # print
 
         if gs.reset_window_counter>=gs.RESET_WINDOW:
             

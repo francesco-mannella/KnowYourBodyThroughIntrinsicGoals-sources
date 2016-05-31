@@ -76,7 +76,7 @@ class Arm:
             joint_lims = vstack([-ones(number_of_joint)*
                 pi,ones(number_of_joint)*pi]).T
         self.joint_lims = array(joint_lims)
-        
+       
         # set origin coords   
         self.origin = array(origin)
 
@@ -262,20 +262,27 @@ class Polychain :
         tot_len = self.get_length()
         curr_len = 0
         dense_chain = []
-        for x in xrange(1,len(self.chain) ) :
-            a = self.chain[x-1]
-            b = self.chain[x]
-            len_seg = norm(a-b)
-            points = 2**density -1
-            gap = (1.0/float(points+1))*len_seg
-            dense_chain.append(self.chain[0])
-            for d in xrange(points):
-                    dist = (curr_len +gap*(1+d))/ float(tot_len)
-                    dense_chain.append(self.get_point( dist ))
-            curr_len += len_seg
+        points = density
+        gap = 1.0/(2+points)
 
-        dense_chain.append(self.chain[-1])
+        dense_chain.append(self.get_point( 0 ))
+       
+        for dist in np.linspace(gap, 1-gap, points):
+            dense_chain.append(self.get_point( dist ))
+        dense_chain.append(self.get_point( 1 ))
 
+
+
+        # for x in xrange(1,len(self.chain) ) :
+        #     a = self.chain[x-1]
+        #     b = self.chain[x]
+        #     len_seg = norm(a-b)
+        #     gap = (1.0/float(points+1))*len_seg
+        #     for d in xrange(points+1):
+        #         dist = (curr_len +gap*(1+d))/ float(tot_len)
+        #         dense_chain.append(self.get_point( dist ))
+        #     curr_len += len_seg
+        # 
         return vstack(dense_chain)
 
     def get_length(self) :
@@ -316,12 +323,12 @@ if __name__ == "__main__" :
     ax.plot(xl, [0,0], c = "black", linestyle = "--")    # plot x-axis
     ax.plot([0,0], yl, c = "black", linestyle = "--")    # plot y-axis     
     external_point = scatter(*point, s= 30, c="r") # plot arm edges
-    dense_points = scatter(*zeros([2,25]), s= 20, c="green") # plot arm edges
+    dense_points = scatter(*zeros([2,25]), s= 20, c=[1,1,0]) # plot arm edges
     xlim(xl)
     ylim(yl) 
 
     # iterate over 100 timesteps
-    for t in range(100):
+    for t in range(10):
       
         # set a random gaussian increment for each joint
         angle = ones(3)*(t*((2*pi)/100.0)) 
@@ -331,9 +338,8 @@ if __name__ == "__main__" :
         poly.set_chain(pos)
       
         point = poly.get_point(0.75)
-
-        dense = poly.get_dense_chain(6)
-        print dense.shape
+        dense = poly.get_dense_chain(10)
+        
         # update plot
         segments.set_data(*pos.T)
         edges.set_offsets(pos)

@@ -32,7 +32,7 @@ __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	cla
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:OptimizedGaussianMaker	file:	access:private
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma, theta=0) :$/;"	m	class:TwoDimensionalGaussianMaker	file:	access:private
 __init__	../model/Controller.py	/^    def __init__(self) :$/;"	m	class:KinematicActuator	access:public
-__init__	../model/Controller.py	/^    def __init__(self, pixels, lims):$/;"	m	class:SensorimotorController	access:public
+__init__	../model/Controller.py	/^    def __init__(self, pixels, lims, touch_th, fovea_radius = 0.3):$/;"	m	class:SensorimotorController	access:public
 __init__	../model/Controller.py	/^    def __init__(self, pixels=[20,20], lims=[[0,1],[0,1]], $/;"	m	class:PerceptionManager	access:public
 __init__	../model/GoalMaker.py	/^    def __init__(self):$/;"	m	class:GoalTesterSim	access:public
 __init__	../model/GoalMaker.py	/^    def __init__(self, n_input_layers, n_singlemod_layers, n_hidden_layers, n_out, n_goalrep,singlemod_lrs,$/;"	m	class:GoalMaker	access:public
@@ -73,8 +73,7 @@ color	../model/test_main.py	/^            color=[.8,.6,.6],$/;"	v
 color	../model/test_main.py	/^            color=[.8,.8,.8],$/;"	v
 controller	../model/Controller.py	/^    controller = SensorimotorController()$/;"	v
 controller	../model/test_main.py	/^    controller = Controller.SensorimotorController()$/;"	v
-controller	../nets/esn.py	/^    controller = ESN($/;"	v
-dense_points	../utils/kinematics.py	/^    dense_points = scatter(*zeros([2,25]), s= 20, c="green") # plot arm edges$/;"	v
+dense_points	../utils/kinematics.py	/^    dense_points = scatter(*zeros([2,25]), s= 20, c=[1,1,0]) # plot arm edges$/;"	v
 dt	../model/test_main.py	/^            dt = 0.001,$/;"	v
 dtype	../model/main.py	/^            dtype=np.ubyte)$/;"	v	class:GoalAbstractionMaps
 dtype	../model/main.py	/^            dtype=np.ubyte)$/;"	v	class:GoalSelectionMaps
@@ -93,7 +92,7 @@ gauss2d_oriented	../utils/gauss_utils.py	/^def gauss2d_oriented(x,y,m1,m2,std_x,
 get_angle	../utils/kinematics.py	/^def get_angle(v1,v2) :$/;"	f	access:public
 get_arm_positions	../model/Robot.py	/^    def get_arm_positions(self) :$/;"	m	class:Robot	access:public
 get_dense_chain	../utils/kinematics.py	/^    def get_dense_chain(self, density) :$/;"	m	class:Polychain	access:public
-get_image	../model/Controller.py	/^    def get_image(self, body_tokens):$/;"	m	class:PerceptionManager	access:public
+get_image	../model/Controller.py	/^    def get_image(self, body_tokens ):$/;"	m	class:PerceptionManager	access:public
 get_joint_positions	../utils/kinematics.py	/^    def get_joint_positions(self,  joint_angles  ):$/;"	m	class:Arm	access:public
 get_length	../utils/kinematics.py	/^    def get_length(self) :$/;"	m	class:Polychain	access:public
 get_point	../utils/kinematics.py	/^    def get_point(self, distance) :$/;"	m	class:Polychain	access:public
@@ -199,6 +198,9 @@ reset	../model/Controller.py	/^    def reset(self) :$/;"	m	class:KinematicActuat
 reset	../model/Controller.py	/^    def reset(self):$/;"	m	class:SensorimotorController	access:public
 reset	../model/GoalSelector.py	/^    def reset(self, match):$/;"	m	class:GoalSelector	access:public
 reset	../nets/esn.py	/^    def reset(self):$/;"	m	class:ESN	access:public
+resetWindow	../model/main.py	/^    def resetWindow(self):$/;"	m	class:GoalAbstractionMaps	access:public
+resetWindow	../model/main.py	/^    def resetWindow(self):$/;"	m	class:GoalSelectionMaps	access:public
+resetWindow	../model/main.py	/^    def resetWindow(self):$/;"	m	class:KinematicsView	access:public
 reset_data	../nets/esn.py	/^    def reset_data(self):$/;"	m	class:ESN	access:public
 reset_data	../nets/kohonen.py	/^    def reset_data(self):$/;"	m	class:Kohonen	access:public
 reset_window	../model/test_main.py	/^            reset_window = 4$/;"	v
@@ -211,12 +213,14 @@ scaled_grid	../utils/gauss_utils.py	/^def scaled_grid(idcs, lims) :$/;"	f	access
 selection_maps	../model/main.py	/^    selection_maps = GoalSelectionMaps(main_app, robot)$/;"	v
 set_angles	../model/Controller.py	/^    def set_angles(self, angles_l, angles_r) :$/;"	m	class:KinematicActuator	access:public
 set_chain	../utils/kinematics.py	/^    def set_chain(self, chain) :$/;"	m	class:Polychain	access:public
+sim	../nets/esn.py	/^    sim = ESN($/;"	v
 singlemod_lrs	../model/test_main.py	/^            singlemod_lrs = [0.3, 0.3, 0.3],$/;"	v
 skin_region	../model/test_main.py	/^            skin_region = [1e10,1e10]$/;"	v
 sm_temp	../model/test_main.py	/^            sm_temp = 0.2,$/;"	v
 softmax	../model/GoalSelector.py	/^def softmax(x, t=0.1):$/;"	f	access:public
 start	../model/main.py	/^    def start(self) :$/;"	m	class:GoalAbstractionMaps	access:public
 start	../model/main.py	/^    def start(self) :$/;"	m	class:GoalSelectionMaps	access:public
+start	../model/main.py	/^    def start(self) :$/;"	m	class:KinematicsView	access:public
 static_inp	../model/test_main.py	/^                static_inp = np.random.rand(*static_inp.shape)$/;"	v
 step	../model/Controller.py	/^    def step(self, larm_delta_angles, rarm_delta_angles):$/;"	m	class:SensorimotorController	access:public
 step	../model/GoalMaker.py	/^    def step(self, raw_inputs):$/;"	m	class:GoalMaker	access:public
@@ -224,10 +228,10 @@ step	../model/GoalMaker.py	/^    def step(self,t):$/;"	m	class:GoalTesterSim	acc
 step	../model/GoalPredictor.py	/^    def step(self, goal_win):$/;"	m	class:GoalPredictor	access:public
 step	../model/GoalSelector.py	/^    def step(self, inp):$/;"	m	class:GoalSelector	access:public
 step	../model/Robot.py	/^    def step(self) :$/;"	m	class:Robot	access:public
-step	../nets/esn.py	/^    def step(self, inp):$/;"	m	class:ESN	access:public
+step	../nets/esn.py	/^    def step(self, inp):  $/;"	m	class:ESN	access:public
 step	../nets/kohonen.py	/^    def step(self, inp) :$/;"	m	class:Kohonen	access:public
 step_fun	../model/GoalMaker.py	/^def step_fun(x, th):$/;"	f	access:public
-step_kinematic	../model/Controller.py	/^    def step_kinematic(self, larm_angles, rarm_angles):$/;"	m	class:SensorimotorController	access:public
+step_kinematic	../model/Controller.py	/^    def step_kinematic(self, larm_angles, rarm_angles, $/;"	m	class:SensorimotorController	access:public
 stime	../model/Controller.py	/^    stime = 100000$/;"	v
 stime	../model/test_main.py	/^    stime = 10000$/;"	v
 stop	../model/main.py	/^    def stop(self) :$/;"	m	class:GoalAbstractionMaps	access:public
