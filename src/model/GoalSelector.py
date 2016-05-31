@@ -123,6 +123,7 @@ class GoalSelector :
         self.read_out = np.zeros(self.N_ROUT_UNITS)
         self.out = np.zeros(self.N_ROUT_UNITS)
         self.tout = np.zeros(self.N_ROUT_UNITS)
+        self.gout = np.zeros(self.N_ROUT_UNITS)
         self.target_position = dict()
         self.target_counter = dict()
         self.match_mean = np.zeros(self.N_GOAL_UNITS)
@@ -182,11 +183,21 @@ class GoalSelector :
             # set the winner to True
             self.goal_win[goal_win_idx] = True 
 
-            self.goal_selected = True
-
             self.t = 0
             self.random_oscil = np.random.rand(2*self.N_ROUT_UNITS)
 
+            self.goal_selected = True
+            
+            goalwin_idx = self.goal_index()
+            try:
+                target = self.target_position[goalwin_idx]
+                self.gout = target 
+            except KeyError : 
+                self.gout = np.zeros(self.N_ROUT_UNITS) 
+
+
+
+        
 
     def update_target(self):
         goalwin_idx = self.goal_index()
@@ -211,6 +222,7 @@ class GoalSelector :
     def reset(self, match):
             self.match_mean += self.MATCH_DECAY*(
                     -self.match_mean + match)*self.goal_win
+            self.goal_win *= 0
             self.goal_window_counter = 0
             self.reset_window_counter = 0
             self.echonet.reset()
@@ -249,7 +261,7 @@ class GoalSelector :
         added_signal = self.NOISE*oscillator(self.t, 10, self.random_oscil)[0]
         self.out = self.read_out + (1.0 - curr_match)*added_signal 
         self.tout = self.read_out 
-        
+         
         self.t += 1
 
     def learn(self, match_value):

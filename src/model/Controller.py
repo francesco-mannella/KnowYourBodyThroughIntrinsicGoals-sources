@@ -237,15 +237,23 @@ class SensorimotorController:
         self.touch_old = self.touch
 
 
-    def step_kinematic(self, larm_angles, rarm_angles):
+    def step_kinematic(self, larm_angles, rarm_angles, 
+            larm_angles_theoric, rarm_angles_theoric, 
+            larm_angles_target, rarm_angles_target):
 
         self.larm_delta_angles = larm_angles - self.larm_angles
         self.rarm_delta_angles = rarm_angles - self.rarm_angles
         self.larm_angles = larm_angles[::-1]
         self.rarm_angles = rarm_angles
-
+        self.larm_angles_theoric = larm_angles_theoric[::-1]
+        self.rarm_angles_theoric = rarm_angles_theoric
+        self.larm_angles_target = larm_angles_target[::-1]
+        self.rarm_angles_target = rarm_angles_target
 
         self.actuator.set_angles(self.larm_angles, self.rarm_angles)
+        self.theoric_actuator.set_angles(self.larm_angles_theoric, self.rarm_angles_theoric)
+        self.target_actuator.set_angles(self.larm_angles_target, self.rarm_angles_target)
+        
         self.larm_angles, self.rarm_angles = (self.actuator.angles_l, 
                 self.actuator.angles_r)
 

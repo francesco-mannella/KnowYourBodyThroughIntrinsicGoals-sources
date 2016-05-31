@@ -91,7 +91,7 @@ class Arm:
         return          (array):    'number of joint' [x,y] coordinates   
         """ 
 
-        #current angles
+        # current angles
         res_joint_angles = joint_angles.copy() 
 
         # detect limits
@@ -102,9 +102,11 @@ class Arm:
         res_joint_angles += self.joint_lims[:,0]*(logical_not(maskminus) )
         res_joint_angles += self.joint_lims[:,1]*(logical_not(maskplus) )
  
+        # mirror
         if self.mirror :
             res_joint_angles = -res_joint_angles
             res_joint_angles[0] += pi 
+
 
 
         
@@ -291,10 +293,11 @@ if __name__ == "__main__" :
             number_of_joint = 3,    # 3 joints 
             origin = [0.0,0.0], # origin at (1.0 , 0.5)
             joint_lims = [ 
-                [0, pi*(3./2.)],    # first joint limits                   
-                [0, pi*0.75],    # second joint limits             
-                [0, pi*0.75]     # third joint limits
-                ]  
+                [0, pi*0.3],    # first joint limits                   
+                [0, pi*0.3],    # second joint limits             
+                [0, pi*0.3]     # third joint limits
+                ],  
+            mirror=True
             )
     
     angle = zeros(3)  
@@ -319,7 +322,7 @@ if __name__ == "__main__" :
     ylim(yl) 
 
     # iterate over 100 timesteps
-    for t in range(10):
+    for t in range(40):
       
         # set a random gaussian increment for each joint
         angle = ones(3)*(t*((2*pi)/100.0)) 

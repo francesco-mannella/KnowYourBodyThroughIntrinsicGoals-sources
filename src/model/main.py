@@ -574,11 +574,15 @@ class KinematicsView(QtGui.QWidget):
                 0, self.WINDOW_BOTTOM+self.WINDOW_HEIGHT) 
       
 
-        (real_l_pos, real_r_pos, target_l_pos,
-                target_r_pos, theor_l_pos, 
-                theor_r_pos, sensors) = self.robot.get_arm_positions()
+        ( real_l_pos, 
+          real_r_pos, 
+          target_l_pos,
+          target_r_pos, 
+          theor_l_pos, 
+          theor_r_pos, 
+          sensors ) = self.robot.get_arm_positions()
 
-        
+
         def paint_arm(curr_pos, curr_color, curr_width):
             painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
             painter.setBrush(curr_color) 
