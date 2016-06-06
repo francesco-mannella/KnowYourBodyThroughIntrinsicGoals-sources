@@ -19,7 +19,8 @@ class Robot :
         self.controller = Controller.SensorimotorController(       
                 pixels = [20, 20],
                 lims = [[-5, 5], [-2, 4.]],
-                touch_th = 0.8 )
+                touch_th = 0.8, 
+                touch_sensors = 0  )
 
         self.GOAL_NUMBER = 9
 
@@ -56,9 +57,9 @@ class Robot :
                 n_out=16,
                 n_goalrep= self.GOAL_NUMBER,
                 singlemod_lrs = [0.05, 0.05, 0.05],
-                hidden_lrs=[0.005, 0.005],
+                hidden_lrs=[0.001, 0.001],
                 output_lr=0.001,
-                goalrep_lr=0.02,
+                goalrep_lr=0.001,
                 goal_th=0.1
             )
 
@@ -179,7 +180,7 @@ class Robot :
 
             self.gm.step([
                 self.controller.pos_delta.ravel()*500.0,
-                self.controller.prop_delta.ravel()*5000.0,
+                self.controller.prop_delta.ravel()*.5,
                 self.controller.touch_delta.ravel()*5000.0])
 
             self.gm.learn()

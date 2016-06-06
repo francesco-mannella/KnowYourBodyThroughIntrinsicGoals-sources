@@ -266,15 +266,10 @@ class Polychain :
         dense_chain = []
         points = density
         dense_chain.append(self.get_point( 0 ))
-        for x in xrange(1,len(self.chain) ) :
-            a = self.chain[x-1]
-            b = self.chain[x]
-            len_seg = norm(a-b)
-            gap = (1.0/float(points+1))*len_seg
-            for d in xrange(points+1):
-                dist = (curr_len +gap*(1+d))/ float(tot_len)
-                dense_chain.append(self.get_point( dist ))
-            curr_len += len_seg
+        for x in xrange( density ) :
+            dense_chain.append(self.get_point( (1+x)/float(density+1) ))
+
+        dense_chain.append(self.get_point( 1 ))
 
         return vstack(dense_chain)
 
@@ -333,7 +328,7 @@ if __name__ == "__main__" :
       
         point = poly.get_point(0.75)
 
-        dense = poly.get_dense_chain(2)
+        dense = poly.get_dense_chain(0)
         print dense.shape
         # update plot
         segments.set_data(*pos.T)
@@ -342,7 +337,9 @@ if __name__ == "__main__" :
         dense_points.set_offsets(dense)
         fig.canvas.draw()
         pause(.00001)
-
+    print 
+    print
+    print dense
     raw_input()
 
 

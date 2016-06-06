@@ -28,6 +28,9 @@ sys.excepthook = my_excepthook
 import numpy as np
 from Robot import Robot
 
+np.set_printoptions(edgeitems=3, linewidth=999,  precision=3,
+        suppress=True, threshold=1000)
+
 #################################################################
 #################################################################
 

@@ -253,8 +253,7 @@ class GoalSelector :
         self.inp = self.echonet.out
         self.read_out = np.dot(self.echo2out_w, self.echonet.out)
         curr_match = np.squeeze(self.match_mean[self.goal_win>0])
-        print  self.match_mean.round(3)
-        print curr_match
+        
         if np.all(self.goal_win==0):
             curr_match = 0.0
  
