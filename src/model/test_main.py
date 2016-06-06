@@ -286,7 +286,6 @@ if __name__ == "__main__":
                         gm_start+(gm_ts*(1+1))+9999], 
                     [gm_height, gm_height ])
 
-        print 1*goal_mask
         idcs = np.nonzero(1*goal_mask)[0]
         if idcs.size>=1  :
             gmm_one.set_data(
