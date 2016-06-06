@@ -40,6 +40,7 @@ class Robot :
                 g2e_spars = 0.2,
                 echo_ampl = 5.0,
                 goal_window = 100,
+                goal_learn_start = 20,
                 reset_window = 10
                 )
 
@@ -55,10 +56,10 @@ class Robot :
                 n_hidden_layers=[16, 16],
                 n_out=16,
                 n_goalrep= self.GOAL_NUMBER,
-                singlemod_lrs = [0.05, 0.05, 0.05],
-                hidden_lrs=[0.005, 0.005],
+                singlemod_lrs = [0.1, 0.1, 0.1],
+                hidden_lrs=[0.001, 0.001],
                 output_lr=0.001,
-                goalrep_lr=0.02,
+                goalrep_lr=0.001,
                 goal_th=0.1
             )
 
@@ -188,8 +189,8 @@ class Robot :
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:
             
             # Train experts
-            
-            self.gs.learn(match_value = self.match_value)
+            if  self.gs.goal_window_counter > self.gs.GOAL_LEARN_START :
+                self.gs.learn()
             
             # update counters
             

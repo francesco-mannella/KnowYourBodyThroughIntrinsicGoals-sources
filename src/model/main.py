@@ -470,16 +470,22 @@ class GoalSelectionMaps(pg.GraphicsView):
     def timerEvent(self, event):
         
         (gmask, gv, gw, gr,targets, esn_data) = self.robot.get_selection_arrays() 
-        
+    
         raw_gw = np.sqrt(len(gw))
         self.plot1.setImage( 0.6*gw.reshape(raw_gw, raw_gw) 
-                +0.4*gr.reshape(raw_gw, raw_gw) , levels=(0,1) )
+            +0.4*gr.reshape(raw_gw, raw_gw) , levels=(0,1) )
        
-        self.plot3.setImage( (gmask).reshape(raw_gw, raw_gw), levels=(0,1) )
-        self.plot4.setImage( (targets).reshape(raw_gw, raw_gw), levels=(0,1) )
+        #self.plot3.setImage( (gmask).reshape(raw_gw, raw_gw), levels=(0,1) )
+        #self.plot4.setImage( (targets).reshape(raw_gw, raw_gw), levels=(0,1) )
    
-        for g in range(self.robot.gs.N_ECHO_UNITS):
-            self.curves[g].setData(esn_data[g])
+        print  "main:481 {} {}".format(
+                self.robot.gs.goal_window_counter,
+                self.robot.gs.goal_window_counter%(self.robot.gs.GOAL_WINDOW*(1/4.)))
+
+        if self.robot.gs.goal_window_counter%(self.robot.gs.GOAL_WINDOW*(1/4.)) >\
+                self.robot.gs.GOAL_WINDOW*(15/64.) :
+            for g in range(self.robot.gs.N_ECHO_UNITS):
+                self.curves[g].setData(esn_data[g])
         
         self.update()
 

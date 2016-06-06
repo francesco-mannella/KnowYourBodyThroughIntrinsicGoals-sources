@@ -246,7 +246,7 @@ step	../model/Robot.py	/^    def step(self) :$/;"	m	class:Robot	access:public
 step	../nets/esn.py	/^    def step(self, inp):$/;"	m	class:ESN	access:public
 step	../nets/kohonen.py	/^    def step(self, inp) :$/;"	m	class:Kohonen	access:public
 step_fun	../model/GoalMaker.py	/^def step_fun(x, th):$/;"	f	access:public
-step_kinematic	../model/Controller.py	/^    def step_kinematic(self, larm_angles, rarm_angles):$/;"	m	class:SensorimotorController	access:public
+step_kinematic	../model/Controller.py	/^    def step_kinematic(self, larm_angles, rarm_angles, $/;"	m	class:SensorimotorController	access:public
 stime	../model/Controller.py	/^    stime = 100000$/;"	v
 stime	../model/test_main.py	/^    stime = 10000$/;"	v
 stop	../model/main.py	/^    def stop(self) :$/;"	m	class:GoalAbstractionMaps	access:public

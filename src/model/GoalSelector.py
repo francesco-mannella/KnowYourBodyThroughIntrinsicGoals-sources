@@ -38,8 +38,8 @@ class GoalSelector :
 
     def __init__(self, dt, tau, alpha, epsilon, eta, n_input,
             n_goal_units, n_echo_units, n_rout_units,
-            im_decay, match_decay, noise, sm_temp, g2e_spars, goal_window, 
-            reset_window, echo_ampl=1000):
+            im_decay, match_decay, noise, sm_temp, g2e_spars,
+            goal_window, goal_learn_start, reset_window, echo_ampl=1000):
         '''
         :param dt: integration time of the ESN
         :param tau: decay of the ESN
@@ -56,6 +56,8 @@ class GoalSelector :
         :param sm_temp: temperature of the softmax
         :param g2e_spars: sparseness of weights form goals to esn
         :param goal_window: max duration of a goal selection
+        :param goal_learn_start: start of learning during trial 
+        :param reset_window: duration of reset
         :param echo_ampl: amplitude of the input to the echo-state
         '''
 
@@ -69,6 +71,7 @@ class GoalSelector :
         self.NOISE = noise
         self.SM_TEMP = sm_temp
         self.GOAL_WINDOW = goal_window
+        self.GOAL_LEARN_START = goal_learn_start
         self.RESET_WINDOW = reset_window
 
         self.N_INPUT = n_input
@@ -211,7 +214,6 @@ class GoalSelector :
             pos_mean =  self.target_position[goalwin_idx]
             pos =  self.out
             n =  self.target_counter[goalwin_idx] 
-            #pos_mean += (1.0/float(n))* (-pos_mean + pos)
             pos_mean += (1.0 - self.match_mean[self.goal_win>0])* (-pos_mean + pos)
             self.target_position[goalwin_idx] = pos_mean
         except KeyError: 
@@ -253,8 +255,7 @@ class GoalSelector :
         self.inp = self.echonet.out
         self.read_out = np.dot(self.echo2out_w, self.echonet.out)
         curr_match = np.squeeze(self.match_mean[self.goal_win>0])
-        print  self.match_mean.round(3)
-        print curr_match
+        
         if np.all(self.goal_win==0):
             curr_match = 0.0
  
@@ -264,7 +265,7 @@ class GoalSelector :
          
         self.t += 1
 
-    def learn(self, match_value):
+    def learn(self):
 
         goalwin_idx = self.goal_index()
 
