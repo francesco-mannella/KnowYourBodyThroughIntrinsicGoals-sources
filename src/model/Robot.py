@@ -19,8 +19,13 @@ class Robot :
         self.controller = Controller.SensorimotorController(       
                 pixels = [20, 20],
                 lims = [[-5, 5], [-2, 4.]],
+<<<<<<< HEAD
                 touch_th = 0.8, 
                 touch_sensors = 0  )
+=======
+                touch_th = 0.8,
+                fovea_radius=.8)
+>>>>>>> b6a3eeb9bf2f021198862582fb1a23a57ec655cb
 
         self.GOAL_NUMBER = 9
 
@@ -34,15 +39,24 @@ class Robot :
                 n_goal_units = self.GOAL_NUMBER,
                 n_echo_units = 100,
                 n_rout_units = self.controller.actuator.NUMBER_OF_JOINTS*2,
+<<<<<<< HEAD
                 im_decay = 0.5,
+=======
+                im_decay = 0.05,
+>>>>>>> b6a3eeb9bf2f021198862582fb1a23a57ec655cb
                 match_decay = 0.5,
                 noise = .5,
                 sm_temp = 0.2,
                 g2e_spars = 0.2,
                 echo_ampl = 5.0,
                 goal_window = 100,
+<<<<<<< HEAD
                 goal_learn_start = 20,
                 reset_window = 10
+=======
+                reset_window = 10,
+                eye_pos = self.controller.eye_pos
+>>>>>>> b6a3eeb9bf2f021198862582fb1a23a57ec655cb
                 )
 
         self.gp = GoalPredictor.GoalPredictor(
@@ -57,10 +71,17 @@ class Robot :
                 n_hidden_layers=[16, 16],
                 n_out=16,
                 n_goalrep= self.GOAL_NUMBER,
+<<<<<<< HEAD
                 singlemod_lrs = [0.05, 0.05, 0.05],
                 hidden_lrs=[0.001, 0.001],
                 output_lr=0.001,
                 goalrep_lr=0.001,
+=======
+                singlemod_lrs = [0.1, 0.1, 0.1],
+                hidden_lrs=[0.005, 0.005],
+                output_lr=0.001,
+                goalrep_lr=0.08,
+>>>>>>> b6a3eeb9bf2f021198862582fb1a23a57ec655cb
                 goal_th=0.1
             )
 
@@ -76,7 +97,9 @@ class Robot :
         self.intrinsic_motivation_value = 0.0
     
         self.static_inp = np.zeros(self.gs.N_INPUT)
-    
+   
+        self.eye_pos = np.zeros(2)
+
     def get_selection_arrays(self) :
 
         sel = self.gs.goal_selected
@@ -85,8 +108,19 @@ class Robot :
         gv = self.gs.goalvec
         gw = self.gs.goal_win
         gr = self.gm.goalrep_layer
-        acquired_targets = self.gs.from_goal_index(self.gs.target_position.keys()) 
-         
+        
+        goal_keys = self.gs.target_position.keys()
+        acquired_targets = []
+        if len(goal_keys) != 0:
+            acquired_targets = self.gs.get_goal_from_index(self.gs.target_position.keys()) 
+            acquired_eye_poss = self.gs.get_eye_pos_from_index(self.gs.target_position.keys())
+       
+            g = np.vstack(( acquired_targets, np.vstack(acquired_eye_poss).T )).T
+
+            for r in g:
+                print "Robot:100  goal: {}  x: {}  y: {}".format(*r)
+            print
+
         targets = np.array([ 1.0*(target in acquired_targets) 
             for target in np.arange(self.gs.N_GOAL_UNITS) ])
         esn_data = self.gs.echonet.data[self.gs.echonet.out_lab]
@@ -114,12 +148,21 @@ class Robot :
         
         sel = self.gs.goal_selected
         
+<<<<<<< HEAD
+=======
+        # real = np.pi*self.gs.out
+        # self.controller.actuator.set_angles(
+        #         real[:(self.gs.N_ROUT_UNITS/2)],
+        #         real[(self.gs.N_ROUT_UNITS/2):]
+        #         )
+>>>>>>> b6a3eeb9bf2f021198862582fb1a23a57ec655cb
         real_l_pos = self.controller.actuator.position_l
         real_r_pos = self.controller.actuator.position_r
         
         real_l_pos *= sel
         real_r_pos *= sel
 
+<<<<<<< HEAD
         goalwin_idx =  self.gs.goal_index()
         target_l_pos = self.controller.target_actuator.position_l
         target_r_pos = self.controller.target_actuator.position_r
@@ -130,13 +173,41 @@ class Robot :
         target_l_pos *= sel
         target_r_pos *= sel
 
+=======
+   
+        goalwin_idx = self.gs.goal_index()
+        if goalwin_idx is not None and self.gs.target_position.has_key(goalwin_idx):
+                target = np.pi*self.gs.target_position[goalwin_idx]
+                self.controller.target_actuator.set_angles(
+                        target[:(self.gs.N_ROUT_UNITS/2)],
+                        target[(self.gs.N_ROUT_UNITS/2):],
+                        )
+                target_l_pos = self.controller.target_actuator.position_l
+                target_r_pos = self.controller.target_actuator.position_r
+        else :
+            target_l_pos = self.controller.target_actuator.position_l*0
+            target_r_pos = self.controller.target_actuator.position_r*0
+        target_l_pos *= sel
+        target_r_pos *= sel
+
+        theoric = np.pi*self.gs.tout
+        self.controller.theoric_actuator.set_angles(
+                theoric[:(self.gs.N_ROUT_UNITS/2)],
+                theoric[(self.gs.N_ROUT_UNITS/2):]
+                )
+>>>>>>> b6a3eeb9bf2f021198862582fb1a23a57ec655cb
         theor_l_pos = self.controller.theoric_actuator.position_l
         theor_r_pos = self.controller.theoric_actuator.position_r
 
         sensors = self.controller.perc.sensors * sel
 
         return (real_l_pos, real_r_pos, target_l_pos,
+<<<<<<< HEAD
                 target_r_pos, theor_l_pos, theor_r_pos, sensors)
+=======
+                target_r_pos, theor_l_pos, theor_r_pos, 
+                sensors, self.controller.eye_pos, self.controller.fovea_radius )
+>>>>>>> b6a3eeb9bf2f021198862582fb1a23a57ec655cb
 
     def step(self) :
    
@@ -149,7 +220,8 @@ class Robot :
             if any(self.goal_mask==True):
                 self.gs.goal_selection(
                         self.intrinsic_motivation_value, 
-                        self.goal_mask )
+                        self.goal_mask,
+                        eye_pos=self.eye_pos)
             else:
                 self.gs.goal_selection(self.intrinsic_motivation_value)
 
@@ -162,7 +234,7 @@ class Robot :
         else:
             if self.gs.reset_window_counter == 0:
                 self.static_inp = np.random.rand(*self.static_inp.shape)
-        
+                self.eye_pos = 0.1 + 0.8*(np.random.rand(2)*4).round(0)/4
         # Movement
 
         self.gs.step( self.static_inp )
@@ -170,19 +242,29 @@ class Robot :
         self.controller.step_kinematic(
                 larm_angles=np.pi*self.gs.out[:(self.gs.N_ROUT_UNITS/2)],
                 rarm_angles=np.pi*self.gs.out[(self.gs.N_ROUT_UNITS/2):],
+<<<<<<< HEAD
                 larm_angles_theoric=np.pi*self.gs.tout[:(self.gs.N_ROUT_UNITS/2)],
                 rarm_angles_theoric=np.pi*self.gs.tout[(self.gs.N_ROUT_UNITS/2):],
                 larm_angles_target=np.pi*self.gs.gout[:(self.gs.N_ROUT_UNITS/2)],
                 rarm_angles_target=np.pi*self.gs.gout[(self.gs.N_ROUT_UNITS/2):],
 
+=======
+                eye_pos=self.eye_pos
+>>>>>>> b6a3eeb9bf2f021198862582fb1a23a57ec655cb
                 )
 
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:
 
             self.gm.step([
+<<<<<<< HEAD
                 self.controller.pos_delta.ravel()*500.0,
                 self.controller.prop_delta.ravel()*.5,
                 self.controller.touch_delta.ravel()*5000.0])
+=======
+                self.controller.pos_delta.ravel()*5000.0,
+                self.controller.prop_delta.ravel()*5000.0,
+                self.controller.touch_delta.ravel()*5000.0] )
+>>>>>>> b6a3eeb9bf2f021198862582fb1a23a57ec655cb
 
             self.gm.learn()
 

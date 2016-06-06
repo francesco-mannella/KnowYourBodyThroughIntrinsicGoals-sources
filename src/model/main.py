@@ -574,14 +574,42 @@ class KinematicsView(QtGui.QWidget):
                 self.WINDOW_WIDTH, 
                 self.WINDOW_HEIGHT)  
 
+        (real_l_pos, real_r_pos, target_l_pos,
+                target_r_pos, theor_l_pos, 
+                theor_r_pos, sensors, eye_pos, 
+                fovea_radius) = self.robot.get_arm_positions()
+
+        # paint arm position
+        curr_width = fovea_radius/self.DOT_RADIUS
+        curr_color = QtGui.QColor(255,230,100)
+        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
+        painter.setBrush(curr_color)  
+        x,y  = eye_pos 
+        painter.drawEllipse(QtCore.QRectF(
+            x - self.DOT_RADIUS*curr_width, 
+            y - self.DOT_RADIUS*curr_width, 
+            self.DOT_RADIUS*2*curr_width, 
+            self.DOT_RADIUS*2*curr_width)) 
+        
+        # paint eye position
+        curr_width = 0.5  
+        curr_color = QtGui.QColor(55,55,0)
+        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
+        painter.setBrush(curr_color)  
+        x,y  = eye_pos 
+        painter.drawEllipse(QtCore.QRectF(
+            x - self.DOT_RADIUS*curr_width, 
+            y - self.DOT_RADIUS*curr_width, 
+            self.DOT_RADIUS*2*curr_width, 
+            self.DOT_RADIUS*2*curr_width)) 
+
         # paint axes
         painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.black), 
             self.AXIS_LINE_WIDTH, QtCore.Qt.DashLine)) 
         painter.drawLine( self.WINDOW_LEFT, 0, 
                 self.WINDOW_LEFT+self.WINDOW_WIDTH,0) 
         painter.drawLine( 0, self.WINDOW_BOTTOM, 
-                0, self.WINDOW_BOTTOM+self.WINDOW_HEIGHT) 
-      
+                0, self.WINDOW_BOTTOM+self.WINDOW_HEIGHT)  
 
         ( real_l_pos, 
           real_r_pos, 
@@ -590,6 +618,7 @@ class KinematicsView(QtGui.QWidget):
           theor_l_pos, 
           theor_r_pos, 
           sensors ) = self.robot.get_arm_positions()
+
 
 
         def paint_arm(curr_pos, curr_color, curr_width):
@@ -660,7 +689,6 @@ class KinematicsView(QtGui.QWidget):
                 y - self.DOT_RADIUS*curr_width, 
                 self.DOT_RADIUS*2*curr_width, 
                 self.DOT_RADIUS*2*curr_width)) 
-       
 
     def timerEvent(self,event):
         
