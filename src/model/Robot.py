@@ -20,7 +20,8 @@ class Robot :
                 pixels = [20, 20],
                 lims = [[-5, 5], [-2, 4.]],
                 touch_th = 0.8, 
-                touch_sensors = 0  )
+                touch_sensors = 0,
+                fovea_radius = .3)
 
         self.GOAL_NUMBER = 9
 
@@ -41,6 +42,7 @@ class Robot :
                 g2e_spars = 0.2,
                 echo_ampl = 5.0,
                 goal_window = 100,
+                goal_learn_start = 20,
                 reset_window = 10
                 )
 
@@ -75,7 +77,9 @@ class Robot :
         self.intrinsic_motivation_value = 0.0
     
         self.static_inp = np.zeros(self.gs.N_INPUT)
-    
+   
+        self.eye_pos = np.zeros(2)
+
     def get_selection_arrays(self) :
 
         sel = self.gs.goal_selected
@@ -84,13 +88,26 @@ class Robot :
         gv = self.gs.goalvec
         gw = self.gs.goal_win
         gr = self.gm.goalrep_layer
-        acquired_targets = self.gs.from_goal_index(self.gs.target_position.keys()) 
-         
+        
+        goal_keys = self.gs.target_position.keys()
+        acquired_targets = []
+        if len(goal_keys) != 0:
+            acquired_targets = self.gs.get_goal_from_index(self.gs.target_position.keys()) 
+            acquired_eye_poss = self.gs.get_eye_pos_from_index(self.gs.target_position.keys())
+       
+            g = np.vstack(( acquired_targets, np.vstack(acquired_eye_poss).T )).T
+
+            for r in g:
+                print "Robot:100  goal: {}  x: {}  y: {}".format(*r)
+            print
+
         targets = np.array([ 1.0*(target in acquired_targets) 
             for target in np.arange(self.gs.N_GOAL_UNITS) ])
         esn_data = self.gs.echonet.data[self.gs.echonet.out_lab]
 
-        return gmask, gv, gw, gr, targets, esn_data
+        
+        return gmask, gv, gw, gr, targets, self.gs.target_position, \
+                esn_data 
         
 
     def get_sensory_arrays(self) :
@@ -135,7 +152,8 @@ class Robot :
         sensors = self.controller.perc.sensors * sel
 
         return (real_l_pos, real_r_pos, target_l_pos,
-                target_r_pos, theor_l_pos, theor_r_pos, sensors)
+                target_r_pos, theor_l_pos, theor_r_pos, sensors, 
+                self.eye_pos, self.controller.fovea_radius )
 
     def step(self) :
    
@@ -148,7 +166,8 @@ class Robot :
             if any(self.goal_mask==True):
                 self.gs.goal_selection(
                         self.intrinsic_motivation_value, 
-                        self.goal_mask )
+                        self.goal_mask,
+                        eye_pos=self.eye_pos)
             else:
                 self.gs.goal_selection(self.intrinsic_motivation_value)
 
@@ -161,7 +180,7 @@ class Robot :
         else:
             if self.gs.reset_window_counter == 0:
                 self.static_inp = np.random.rand(*self.static_inp.shape)
-        
+                self.eye_pos = 0.1 + 0.8*(np.random.rand(2)*4).round(0)/4
         # Movement
 
         self.gs.step( self.static_inp )
@@ -173,7 +192,7 @@ class Robot :
                 rarm_angles_theoric=np.pi*self.gs.tout[(self.gs.N_ROUT_UNITS/2):],
                 larm_angles_target=np.pi*self.gs.gout[:(self.gs.N_ROUT_UNITS/2)],
                 rarm_angles_target=np.pi*self.gs.gout[(self.gs.N_ROUT_UNITS/2):],
-
+                eye_pos=self.eye_pos
                 )
 
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:
@@ -189,8 +208,8 @@ class Robot :
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:
             
             # Train experts
-            
-            self.gs.learn(match_value = self.match_value)
+            if  self.gs.goal_window_counter > self.gs.GOAL_LEARN_START :
+                self.gs.learn()
             
             # update counters
             

@@ -436,6 +436,10 @@ class GoalSelectionMaps(pg.GraphicsView):
         view.setAspectLocked(lock=True, ratio=1)
         
         view = layout.addViewBox(row=0,col=3)
+        self.plot5 = pg.ImageItem(border='w',lut=self.lut)
+        view.addItem(self.plot5)
+        view.setAspectLocked(lock=True, ratio=1)
+
         view = layout.addViewBox(row=0,col=4)
 
         layout.nextRow() 
@@ -472,17 +476,25 @@ class GoalSelectionMaps(pg.GraphicsView):
 
     def timerEvent(self, event):
         
-        (gmask, gv, gw, gr,targets, esn_data) = self.robot.get_selection_arrays() 
-        
+        (gmask, gv, gw, gr,targets, 
+                target_trajectories, 
+                esn_data ) = self.robot.get_selection_arrays() 
+    
         raw_gw = np.sqrt(len(gw))
         self.plot1.setImage( 0.6*gw.reshape(raw_gw, raw_gw) 
-                +0.4*gr.reshape(raw_gw, raw_gw) , levels=(0,1) )
+            +0.4*gr.reshape(raw_gw, raw_gw) , levels=(0,1) )
        
-        self.plot3.setImage( (gmask).reshape(raw_gw, raw_gw), levels=(0,1) )
+        self.plot3.setImage( (gmask).reshape(raw_gw, raw_gw), levels=(0,1) ) 
         self.plot4.setImage( (targets).reshape(raw_gw, raw_gw), levels=(0,1) )
-   
-        for g in range(self.robot.gs.N_ECHO_UNITS):
-            self.curves[g].setData(esn_data[g])
+ 
+        print  "main:481 {} {}".format(
+                self.robot.gs.goal_window_counter,
+                self.robot.gs.goal_window_counter%(self.robot.gs.GOAL_WINDOW*(1/4.)))
+
+        if self.robot.gs.goal_window_counter%(self.robot.gs.GOAL_WINDOW*(1/4.)) >\
+                self.robot.gs.GOAL_WINDOW*(15/64.) :
+            for g in range(self.robot.gs.N_ECHO_UNITS):
+                self.curves[g].setData(esn_data[g])
         
         self.update()
 
@@ -568,22 +580,42 @@ class KinematicsView(QtGui.QWidget):
                 self.WINDOW_WIDTH, 
                 self.WINDOW_HEIGHT)  
 
+        (real_l_pos, real_r_pos, target_l_pos,
+                target_r_pos, theor_l_pos, 
+                theor_r_pos, sensors, eye_pos, 
+                fovea_radius) = self.robot.get_arm_positions()
+
+        # paint arm position
+        curr_width = fovea_radius/self.DOT_RADIUS
+        curr_color = QtGui.QColor(255,230,100)
+        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
+        painter.setBrush(curr_color)  
+        x,y  = eye_pos 
+        painter.drawEllipse(QtCore.QRectF(
+            x - self.DOT_RADIUS*curr_width, 
+            y - self.DOT_RADIUS*curr_width, 
+            self.DOT_RADIUS*2*curr_width, 
+            self.DOT_RADIUS*2*curr_width)) 
+        
+        # paint eye position
+        curr_width = 0.5  
+        curr_color = QtGui.QColor(55,55,0)
+        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
+        painter.setBrush(curr_color)  
+        x,y  = eye_pos 
+        painter.drawEllipse(QtCore.QRectF(
+            x - self.DOT_RADIUS*curr_width, 
+            y - self.DOT_RADIUS*curr_width, 
+            self.DOT_RADIUS*2*curr_width, 
+            self.DOT_RADIUS*2*curr_width)) 
+
         # paint axes
         painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.black), 
             self.AXIS_LINE_WIDTH, QtCore.Qt.DashLine)) 
         painter.drawLine( self.WINDOW_LEFT, 0, 
                 self.WINDOW_LEFT+self.WINDOW_WIDTH,0) 
         painter.drawLine( 0, self.WINDOW_BOTTOM, 
-                0, self.WINDOW_BOTTOM+self.WINDOW_HEIGHT) 
-      
-
-        ( real_l_pos, 
-          real_r_pos, 
-          target_l_pos,
-          target_r_pos, 
-          theor_l_pos, 
-          theor_r_pos, 
-          sensors ) = self.robot.get_arm_positions()
+                0, self.WINDOW_BOTTOM+self.WINDOW_HEIGHT)  
 
 
         def paint_arm(curr_pos, curr_color, curr_width):
@@ -654,7 +686,6 @@ class KinematicsView(QtGui.QWidget):
                 y - self.DOT_RADIUS*curr_width, 
                 self.DOT_RADIUS*2*curr_width, 
                 self.DOT_RADIUS*2*curr_width)) 
-       
 
     def timerEvent(self,event):
         

@@ -39,7 +39,7 @@ class PerceptionManager:
        
       
     
-    def get_image(self, body_tokens):
+    def get_image(self, body_tokens ):
 
         image = np.zeros(self.pixels)
         for c in body_tokens:
@@ -162,10 +162,12 @@ class KinematicActuator :
 
 class SensorimotorController:
 
-    def __init__(self, pixels, lims, touch_th, touch_sensors = 0):
+    def __init__(self, pixels, lims, touch_th, fovea_radius = 10, 
+            touch_sensors = 0):
 
         self.pixels = pixels 
         self.lims = lims
+        self.fovea_radius = fovea_radius
 
         self.actuator = KinematicActuator()
         self.theoric_actuator = KinematicActuator()
@@ -244,7 +246,7 @@ class SensorimotorController:
 
     def step_kinematic(self, larm_angles, rarm_angles, 
             larm_angles_theoric, rarm_angles_theoric, 
-            larm_angles_target, rarm_angles_target):
+            larm_angles_target, rarm_angles_target, eye_pos):
 
         self.larm_delta_angles = larm_angles - self.larm_angles
         self.rarm_delta_angles = rarm_angles - self.rarm_angles
@@ -268,6 +270,15 @@ class SensorimotorController:
 
         self.pos = self.perc.get_image(body_tokens=curr_body_tokens)
         self.pos_delta = self.pos - self.pos_old
+
+        hand_pos = self.actuator.position_l[-1]
+        g = self.perc.gm(hand_pos, self.fovea_radius)[0]
+        hand_mask = g.reshape(*self.pixels).T
+        g = self.perc.gm(eye_pos, self.fovea_radius)[0]
+        fovea_mask = g.reshape(*self.pixels).T
+
+        self.pos_delta *= hand_mask
+        self.pos_delta *= fovea_mask
 
         # PROPRIOCEPTION
         body_tokens = self.init_body_tokens
@@ -297,99 +308,3 @@ class SensorimotorController:
         self.touch *=0 
 
 
-
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-
-if __name__ == "__main__" :
-
-    import matplotlib.pyplot as plt
-    plt.ion()
-    plt.close("all")
-
-    #-------------------------------------------------------------------------
-    #-------------------------------------------------------------------------
-    #-------------------------------------------------------------------------
-
-    controller = SensorimotorController()
-
-    #-------------------------------------------------------------------------
-    #-------------------------------------------------------------------------
-    #-------------------------------------------------------------------------
-
-    import matplotlib.gridspec as gridspec
-    gs = gridspec.GridSpec(5, 2)
-
-    fig = plt.figure(figsize=(8,12))
-
-
-    ax = fig.add_subplot(gs[:2,:], aspect="auto")
-    linel, = ax.plot(*np.zeros([2,4]))
-    pointsl = ax.scatter(*np.zeros([2,4]))
-    liner, = ax.plot(*np.zeros([2,4]))
-    pointsr = ax.scatter(*np.zeros([2,4]))
-    ax.set_xlim(controller.lims[0])
-    ax.set_ylim(controller.lims[1])
-
-    axes = []
-    imgs = []
-
-    image_default = np.zeros([20, 20])
-
-    for x in xrange(3):
-        for y in xrange(2):
-            ax = fig.add_subplot(gs[2+x,y])
-            img = ax.imshow(image_default, interpolation='none',
-                   vmin=-1, vmax=1, cmap=plt.cm.binary)
-            axes.append(ax)
-            imgs.append(img)
-
-    stime = 100000
-    period = 10.0
-
-    for t in  xrange(stime):
-
-        #---------------------------------------------------------------------
-        #---------------------------------------------------------------------
-        #---------------------------------------------------------------------
-
-        if np.mean(controller.actuator.angles_l) < np.pi*0.2 :
-            ldelta = np.ones(controller.actuator.NUMBER_OF_JOINTS)*0.3+np.sin(t/period)*0.2
-        else :
-            ldelta = -np.ones(controller.actuator.NUMBER_OF_JOINTS)*0.3+np.sin(t/period)*0.2
-
-        if np.mean(controller.actuator.angles_r) < np.pi*0.2 :
-            rdelta = np.ones(controller.actuator.NUMBER_OF_JOINTS)*0.2+np.sin(t/period)*0.2
-        else :
-            rdelta = -np.ones(controller.actuator.NUMBER_OF_JOINTS)*0.2+np.sin(t/period)*0.2
-
-        controller.step(larm_delta_angles=ldelta, rarm_delta_angles=rdelta)
-
-        data =[controller.pos,
-               controller.pos_delta,
-               controller.prop*50.,
-               controller.prop_delta*50.,
-               controller.touch*50.,
-               controller.touch_delta*50.
-               ]
-
-        #---------------------------------------------------------------------
-        #---------------------------------------------------------------------
-        #---------------------------------------------------------------------
-
-        linel.set_data(*controller.ctrl.position_l.T)
-        pointsl.set_offsets(controller.ctrl.position_l)
-        liner.set_data(*controller.ctrl.position_r.T)
-        pointsr.set_offsets(controller.ctrl.position_r)
-        for x in xrange(6):
-            d = data[x]
-            d = d[::-1]
-            imgs[x].set_array(d)
-        fig.canvas.draw()
-
-        plt.pause(0.00001)
-
-
-
-    raw_input() 

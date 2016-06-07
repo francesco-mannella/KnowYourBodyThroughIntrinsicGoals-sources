@@ -328,8 +328,9 @@ if __name__ == "__main__" :
       
         point = poly.get_point(0.75)
 
-        dense = poly.get_dense_chain(0)
+        dense = poly.get_dense_chain(6)
         print dense.shape
+
         # update plot
         segments.set_data(*pos.T)
         edges.set_offsets(pos)
