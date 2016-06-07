@@ -162,12 +162,11 @@ class KinematicActuator :
 
 class SensorimotorController:
 
-    def __init__(self, pixels, lims, touch_th, fovea_radius = 10, 
+    def __init__(self, pixels, lims, touch_th,  
             touch_sensors = 0):
 
         self.pixels = pixels 
         self.lims = lims
-        self.fovea_radius = fovea_radius
 
         self.actuator = KinematicActuator()
         self.theoric_actuator = KinematicActuator()
@@ -246,7 +245,7 @@ class SensorimotorController:
 
     def step_kinematic(self, larm_angles, rarm_angles, 
             larm_angles_theoric, rarm_angles_theoric, 
-            larm_angles_target, rarm_angles_target, eye_pos):
+            larm_angles_target, rarm_angles_target ):
 
         self.larm_delta_angles = larm_angles - self.larm_angles
         self.rarm_delta_angles = rarm_angles - self.rarm_angles
@@ -271,14 +270,6 @@ class SensorimotorController:
         self.pos = self.perc.get_image(body_tokens=curr_body_tokens)
         self.pos_delta = self.pos - self.pos_old
 
-        hand_pos = self.actuator.position_l[-1]
-        g = self.perc.gm(hand_pos, self.fovea_radius)[0]
-        hand_mask = g.reshape(*self.pixels).T
-        g = self.perc.gm(eye_pos, self.fovea_radius)[0]
-        fovea_mask = g.reshape(*self.pixels).T
-
-        self.pos_delta *= hand_mask
-        self.pos_delta *= fovea_mask
 
         # PROPRIOCEPTION
         body_tokens = self.init_body_tokens

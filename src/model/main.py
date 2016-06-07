@@ -582,33 +582,9 @@ class KinematicsView(QtGui.QWidget):
 
         (real_l_pos, real_r_pos, target_l_pos,
                 target_r_pos, theor_l_pos, 
-                theor_r_pos, sensors, eye_pos, 
-                fovea_radius) = self.robot.get_arm_positions()
+                theor_r_pos, sensors ) = self.robot.get_arm_positions()
 
-        # paint arm position
-        curr_width = fovea_radius/self.DOT_RADIUS
-        curr_color = QtGui.QColor(255,230,100)
-        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
-        painter.setBrush(curr_color)  
-        x,y  = eye_pos 
-        painter.drawEllipse(QtCore.QRectF(
-            x - self.DOT_RADIUS*curr_width, 
-            y - self.DOT_RADIUS*curr_width, 
-            self.DOT_RADIUS*2*curr_width, 
-            self.DOT_RADIUS*2*curr_width)) 
         
-        # paint eye position
-        curr_width = 0.5  
-        curr_color = QtGui.QColor(55,55,0)
-        painter.setPen( QtGui.QPen( curr_color, self.LINE_WIDTH*curr_width) ) 
-        painter.setBrush(curr_color)  
-        x,y  = eye_pos 
-        painter.drawEllipse(QtCore.QRectF(
-            x - self.DOT_RADIUS*curr_width, 
-            y - self.DOT_RADIUS*curr_width, 
-            self.DOT_RADIUS*2*curr_width, 
-            self.DOT_RADIUS*2*curr_width)) 
-
         # paint axes
         painter.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.black), 
             self.AXIS_LINE_WIDTH, QtCore.Qt.DashLine)) 
