@@ -436,6 +436,10 @@ class GoalSelectionMaps(pg.GraphicsView):
         view.setAspectLocked(lock=True, ratio=1)
         
         view = layout.addViewBox(row=0,col=3)
+        self.plot5 = pg.ImageItem(border='w',lut=self.lut)
+        view.addItem(self.plot5)
+        view.setAspectLocked(lock=True, ratio=1)
+
         view = layout.addViewBox(row=0,col=4)
 
         layout.nextRow() 
@@ -472,15 +476,17 @@ class GoalSelectionMaps(pg.GraphicsView):
 
     def timerEvent(self, event):
         
-        (gmask, gv, gw, gr,targets, esn_data) = self.robot.get_selection_arrays() 
+        (gmask, gv, gw, gr,targets, 
+                target_trajectories, 
+                esn_data ) = self.robot.get_selection_arrays() 
     
         raw_gw = np.sqrt(len(gw))
         self.plot1.setImage( 0.6*gw.reshape(raw_gw, raw_gw) 
             +0.4*gr.reshape(raw_gw, raw_gw) , levels=(0,1) )
        
-        #self.plot3.setImage( (gmask).reshape(raw_gw, raw_gw), levels=(0,1) )
-        #self.plot4.setImage( (targets).reshape(raw_gw, raw_gw), levels=(0,1) )
-   
+        self.plot3.setImage( (gmask).reshape(raw_gw, raw_gw), levels=(0,1) ) 
+        self.plot4.setImage( (targets).reshape(raw_gw, raw_gw), levels=(0,1) )
+ 
         print  "main:481 {} {}".format(
                 self.robot.gs.goal_window_counter,
                 self.robot.gs.goal_window_counter%(self.robot.gs.GOAL_WINDOW*(1/4.)))
@@ -610,15 +616,6 @@ class KinematicsView(QtGui.QWidget):
                 self.WINDOW_LEFT+self.WINDOW_WIDTH,0) 
         painter.drawLine( 0, self.WINDOW_BOTTOM, 
                 0, self.WINDOW_BOTTOM+self.WINDOW_HEIGHT)  
-
-        ( real_l_pos, 
-          real_r_pos, 
-          target_l_pos,
-          target_r_pos, 
-          theor_l_pos, 
-          theor_r_pos, 
-          sensors ) = self.robot.get_arm_positions()
-
 
 
         def paint_arm(curr_pos, curr_color, curr_width):

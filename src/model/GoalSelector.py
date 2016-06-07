@@ -148,7 +148,7 @@ class GoalSelector :
         self.random_oscil = np.random.rand(2*self.N_ROUT_UNITS)
         self.t = 0
 
-        self.eye_pos = eye_pos
+        self.eye_pos = np.zeros(2) 
 
     def goal_index(self):
 
@@ -242,10 +242,10 @@ class GoalSelector :
             self.goal_selected = True
             
             goalwin_idx = self.goal_index()
-            try:
+            if goalwin_idx is not None and self.target_position.has_key(goalwin_idx):
                 target = self.target_position[goalwin_idx]
                 self.gout = target 
-            except KeyError : 
+            else : 
                 self.gout = np.zeros(self.N_ROUT_UNITS) 
 
 
