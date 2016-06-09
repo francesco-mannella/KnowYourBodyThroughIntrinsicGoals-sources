@@ -147,6 +147,8 @@ class GoalSelector :
             idx = np.nonzero(self.goal_win>0)[0][0]
             return idx 
 
+    def get_goal_from_index(self,idx):
+        return idx
         
     def goal_selection(self, im_value, goal_mask = None, eye_pos=[-99,-99] ):
         '''
@@ -269,7 +271,6 @@ class GoalSelector :
         #------------------------------------------------
         if goalwin_idx is not None and self.target_position.has_key(goalwin_idx):
             if self.target_position.has_key(goalwin_idx):
-                print "GoalSelector:312 {}".format(goalwin_idx)
                 target = self.target_position[goalwin_idx]
                 x = self.inp
                 y = self.read_out

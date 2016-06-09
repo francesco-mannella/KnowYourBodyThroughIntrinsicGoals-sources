@@ -20,9 +20,12 @@ class Robot :
                 pixels = [20, 20],
                 lims = [[-5, 5], [-2, 4.]],
                 touch_th = 0.8, 
-                touch_sensors = 0   )
+                touch_sensors = 18,
+                touch_sigma=0.1, 
+                touch_len=0.6
+                )
 
-        self.GOAL_NUMBER = 9
+        self.GOAL_NUMBER = 16
 
         self.gs = GoalSelector.GoalSelector(
                 dt = 0.001,
@@ -34,7 +37,7 @@ class Robot :
                 n_goal_units = self.GOAL_NUMBER,
                 n_echo_units = 100,
                 n_rout_units = self.controller.actuator.NUMBER_OF_JOINTS*2,
-                im_decay = 0.5,
+                im_decay = 0.9,
                 match_decay = 0.5,
                 noise = .5,
                 sm_temp = 0.2,
@@ -57,10 +60,10 @@ class Robot :
                 n_hidden_layers=[16, 16],
                 n_out=16,
                 n_goalrep= self.GOAL_NUMBER,
-                singlemod_lrs = [0.05, 0.05, 0.05],
+                singlemod_lrs = [0.00, 0.00, 0.5],
                 hidden_lrs=[0.001, 0.001],
                 output_lr=0.001,
-                goalrep_lr=0.001,
+                goalrep_lr=0.1,
                 goal_th=0.1
             )
 

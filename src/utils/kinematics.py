@@ -34,123 +34,15 @@ from scipy.ndimage import gaussian_filter1d
 import scipy.optimize  
 import time 
 
+
 #----------------------------------------------------------------------
 #----------------------------------------------------------------------
-class Arm:
-    """
-    
-    Kinematics of a number_of_joint-degrees-of-freedom 
-    2-dimensional arm.
-    
-    Given the increment of joint angles calculate
-    the current positions of the edges of the
-    arm segments.
-
-    """
-
-    def __init__(self,
-            number_of_joint = 3,
-            joint_lims = None, 
-            segment_lengths = None,
-            origin = [0,0],
-            mirror = False
-            ):
-        """
-        number_of_joint:     (int)    number of joints
-        joint_angles       (list):    initial joint angles
-        joint_lims         (list):    joint angles limits 
-        segment_lengths    (list):    length of arm segmens
-        origin             (list):    origin coords of arm
-        """
-
-        self.mirror = mirror
-        self.number_of_joint = number_of_joint
-        
-        # initialize lengths
-        if segment_lengths is None:
-            segment_lengths = ones(number_of_joint)
-        self.segment_lengths = array(segment_lengths)
-       
-        # initialize limits   
-        if joint_lims is None:
-            joint_lims = vstack([-ones(number_of_joint)*
-                pi,ones(number_of_joint)*pi]).T
-        self.joint_lims = array(joint_lims)
-       
-        # set origin coords   
-        self.origin = array(origin)
-
-
-          
- 
-    def get_joint_positions(self,  joint_angles  ):
-        """    
-        Finds the (x, y) coordinates
-        of each joint   
-        joint_angles   (vector):    current angles of the joints    
-        return          (array):    'number of joint' [x,y] coordinates   
-        """ 
-
-        # current angles
-        res_joint_angles = joint_angles.copy() 
-
-        # detect limits
-        maskminus= res_joint_angles > self.joint_lims[:,0]
-        maskplus = res_joint_angles < self.joint_lims[:,1]
-  
-        res_joint_angles =  res_joint_angles*(maskplus*maskminus) 
-        res_joint_angles += self.joint_lims[:,0]*(logical_not(maskminus) )
-        res_joint_angles += self.joint_lims[:,1]*(logical_not(maskplus) )
- 
-        # mirror
-        if self.mirror :
-            res_joint_angles = -res_joint_angles
-            res_joint_angles[0] += pi 
-
-
-
-        
-        # calculate x coords of arm edges.
-        # the x-axis position of each edge is the 
-        # sum of its projection on the x-axis
-        # and all the projections of the 
-        # previous edges 
-        x = array([  
-                    sum([ 
-                            self.segment_lengths[j] *
-                            cos( (res_joint_angles[:(k+1)]).sum() ) 
-                            for k in range(j+1) 
-                        ])
-                        for j in range(self.number_of_joint) 
-                  ])
-        
-        # trabslate to the x origin 
-        x = hstack([self.origin[0], x+self.origin[0]])
-
-        # calculate y coords of arm edges.
-        # the y-axis position of each edge is the 
-        # sum of its projection on the x-axis
-        # and all the projections of the 
-        # previous edges 
-        y = array([  
-            sum([ 
-                    self.segment_lengths[j] *
-                    sin( (res_joint_angles[:(k+1)]).sum() ) 
-                    for k in range(j+1) 
-                ])
-                for j in range(self.number_of_joint) 
-            ])
-        
-        # translate to the y origin 
-        y = hstack([self.origin[1], y+self.origin[1]])
-
-        pos = array([x, y]).T
-
-        return (pos, res_joint_angles)
-    
-    
 #----------------------------------------------------------------------
 #----------------------------------------------------------------------
+# UTILS ---------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+
 def get_angle(v1,v2) :
     """
     Calculate the angle between two vectors
@@ -212,24 +104,26 @@ class Polychain :
         '''
 
         distances = []
+        c = array(point)
         for x in xrange(1,len(self.chain) ) :
             
             a = self.chain[x-1]
             b = self.chain[x]
-            c = array(point)
             
             # check if the  point is within the same line
-            if norm(cross(b-a, c-a)) < epsilon :
-                
-                abac = dot(b-a, c-a)
-                ab = dot(b-a, b-a)
-                if 0 <= abac <= ab :
+            if all(c!=a) and all(c!=b) :
+                if norm(cross(b-a, c-a)) < epsilon :
+                    
+                    abac = dot(b-a, c-a)
+                    ab = dot(b-a, b-a)
+                    if 0 <= abac <= ab :
 
-                    distance = sum(self.seg_lens[:(x-1)])
-                    distance += norm(point - self.chain[x-1])
-                    distance = distance/sum(self.seg_lens)
+                        distance = sum(self.seg_lens[:(x-1)])
+                        distance += norm(point - self.chain[x-1])
+                        distance = distance/sum(self.seg_lens)
 
-                    distances.append( distance )
+                        distances.append( distance )
+
 
         return distances
       
@@ -280,6 +174,134 @@ class Polychain :
         return sum(self.seg_lens)
 
 
+
+
+
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# ARM -----------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+
+class Arm(object):
+    """
+    
+    Kinematics of a number_of_joint-degrees-of-freedom 
+    2-dimensional arm.
+    
+    Given the increment of joint angles calculate
+    the current positions of the edges of the
+    arm segments.
+
+    """
+
+    def __init__(self,
+            number_of_joint = 3,
+            joint_lims = None, 
+            segment_lengths = None,
+            origin = [0,0],
+            mirror = False
+            ):
+        """
+        number_of_joint:     (int)    number of joints
+        joint_angles       (list):    initial joint angles
+        joint_lims         (list):    joint angles limits 
+        segment_lengths    (list):    length of arm segmens
+        origin             (list):    origin coords of arm
+        """
+
+        self.mirror = mirror
+        self.number_of_joint = number_of_joint
+        
+        # initialize lengths
+        if segment_lengths is None:
+            segment_lengths = ones(number_of_joint)
+        self.segment_lengths = array(segment_lengths)
+       
+        # initialize limits   
+        if joint_lims is None:
+            joint_lims = vstack([-ones(number_of_joint)*
+                pi,ones(number_of_joint)*pi]).T
+        self.joint_lims = array(joint_lims)
+       
+        # set origin coords   
+        self.origin = array(origin)
+        
+    def get_joint_positions(self,  joint_angles  ):
+        """    
+        Finds the (x, y) coordinates
+        of each joint   
+        joint_angles   (vector):    current angles of the joints    
+        return          (array):    'number of joint' [x,y] coordinates   
+        """ 
+
+
+        # current angles
+        res_joint_angles = joint_angles.copy() 
+
+        # detect limits
+        maskminus= res_joint_angles > self.joint_lims[:,0]
+        maskplus = res_joint_angles < self.joint_lims[:,1]
+  
+        res_joint_angles =  res_joint_angles*(maskplus*maskminus) 
+        res_joint_angles += self.joint_lims[:,0]*(logical_not(maskminus) )
+        res_joint_angles += self.joint_lims[:,1]*(logical_not(maskplus) )
+ 
+        # mirror
+        if self.mirror :
+            res_joint_angles = -res_joint_angles
+            res_joint_angles[0] += pi 
+
+ 
+        # calculate x coords of arm edges.
+        # the x-axis position of each edge is the 
+        # sum of its projection on the x-axis
+        # and all the projections of the 
+        # previous edges 
+        x = array([  
+                    sum([ 
+                            self.segment_lengths[j] *
+                            cos( (res_joint_angles[:(k+1)]).sum() ) 
+                            for k in range(j+1) 
+                        ])
+                        for j in range(self.number_of_joint) 
+                  ])
+        
+        # trabslate to the x origin 
+        x = hstack([self.origin[0], x+self.origin[0]])
+
+        # calculate y coords of arm edges.
+        # the y-axis position of each edge is the 
+        # sum of its projection on the x-axis
+        # and all the projections of the 
+        # previous edges 
+        y = array([  
+            sum([ 
+                    self.segment_lengths[j] *
+                    sin( (res_joint_angles[:(k+1)]).sum() ) 
+                    for k in range(j+1) 
+                ])
+                for j in range(self.number_of_joint) 
+            ])
+        
+        # translate to the y origin 
+        y = hstack([self.origin[1], y+self.origin[1]])
+
+        pos = array([x, y]).T
+ 
+        return (pos, res_joint_angles)
+    
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# TEST ----------------------------------------------------------------
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+
+    
 if __name__ == "__main__" :
     
     ion()

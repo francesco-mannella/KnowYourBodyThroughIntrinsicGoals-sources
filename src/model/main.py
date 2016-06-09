@@ -4,6 +4,7 @@
 
 import os
 import sys
+import copy
 
 # working dir is the base dir of this file
 pathname = os.path.dirname(sys.argv[0])
@@ -417,36 +418,32 @@ class GoalSelectionMaps(pg.GraphicsView):
 
 	self.setWindowTitle("Selection and control")
                
-        layout = pg.GraphicsLayout(border=pg.mkPen({'color':'300','width':2}))
+        layout = pg.GraphicsLayout()
         self.setCentralItem(layout)  
+
  
-        view = layout.addViewBox(row=0,col=0)
+        view = layout.addViewBox(row=0,col=0,colspan=1)
         self.plot1 = pg.ImageItem(border='w',lut=self.lut)
         view.addItem(self.plot1)
         view.setAspectLocked(lock=True, ratio=1)
         
-        view = layout.addViewBox(row=0,col=1)
+        view = layout.addViewBox(row=0,col=1,colspan=1)
         self.plot3 = pg.ImageItem(border='w',lut=self.lut)
         view.addItem(self.plot3)
         view.setAspectLocked(lock=True, ratio=1)
         
-        view = layout.addViewBox(row=0,col=2)
+   
+        view = layout.addViewBox(row=0,col=2,colspan=1)   
         self.plot4 = pg.ImageItem(border='w',lut=self.lut)
         view.addItem(self.plot4)
-        view.setAspectLocked(lock=True, ratio=1)
+        view.setAspectLocked(lock=True, ratio=1)       
         
-        view = layout.addViewBox(row=0,col=3)
-        self.plot5 = pg.ImageItem(border='w',lut=self.lut)
-        view.addItem(self.plot5)
-        view.setAspectLocked(lock=True, ratio=1)
-
-        view = layout.addViewBox(row=0,col=4)
-
-        layout.nextRow() 
-        
-        
-        self.plot2 =layout.addPlot(row=2,col=0, rowspan=3, colspan=5) 
-
+        self.plot5view = layout.addViewBox(row=0,col=3, colspan=2)
+        self.plot5 = pg.GraphItem()
+        self.plot5view.addItem(self.plot5)
+ 
+        self.plot2 = layout.addPlot(row=2,col=0, rowspan=3, colspan=5) 
+        view = layout.addViewBox(row=4,col=2)   
 
         self.robot = robot
        
@@ -476,23 +473,64 @@ class GoalSelectionMaps(pg.GraphicsView):
 
     def timerEvent(self, event):
         
-        (gmask, gv, gw, gr,targets, 
-                target_trajectories, 
+        (gmask, gv, gw, gr, targets, 
+                target_position, 
                 esn_data ) = self.robot.get_selection_arrays() 
     
-        raw_gw = np.sqrt(len(gw))
+        goals = len(gw)
+        raw_gw = int(np.sqrt(goals))
         self.plot1.setImage( 0.6*gw.reshape(raw_gw, raw_gw) 
             +0.4*gr.reshape(raw_gw, raw_gw) , levels=(0,1) )
        
         self.plot3.setImage( (gmask).reshape(raw_gw, raw_gw), levels=(0,1) ) 
-        self.plot4.setImage( (targets).reshape(raw_gw, raw_gw), levels=(0,1) )
- 
-        print  "main:481 {} {}".format(
-                self.robot.gs.goal_window_counter,
-                self.robot.gs.goal_window_counter%(self.robot.gs.GOAL_WINDOW*(1/4.)))
+        self.plot4.setImage( (targets).reshape(raw_gw, raw_gw), levels=(0,1) ) 
+        
+        
+        gr  = self.plot5
+        lims = self.robot.controller.perc.lims
+        rngs = lims[:,1]-lims[:,0]
+        mins = lims[:,0]
 
-        if self.robot.gs.goal_window_counter%(self.robot.gs.GOAL_WINDOW*(1/4.)) >\
-                self.robot.gs.GOAL_WINDOW*(15/64.) :
+        self.plot5view.setXRange(0,raw_gw)
+        self.plot5view.setYRange(0,raw_gw)
+        act = copy.deepcopy(self.robot.controller.actuator) 
+        goal_idcs = np.arange(goals).reshape(raw_gw,raw_gw)
+        
+        ps = []
+        for goal in target_position.keys() :
+             row, col = np.squeeze(np.nonzero(goal_idcs==goal))
+             trj_angles = target_position[goal]
+             larm_angles = np.pi*trj_angles[:(self.robot.gs.N_ROUT_UNITS/2)]
+             larm_angles = larm_angles[::-1]
+             rarm_angles = np.pi*trj_angles[(self.robot.gs.N_ROUT_UNITS/2):]
+  
+             act.set_angles(larm_angles, rarm_angles)
+             lp = (act.position_l-mins)/rngs + [row, col] 
+             rp = (act.position_r-mins)/rngs + [row, col] 
+             ps.append(lp)
+             ps.append(rp)
+       
+        pos=None
+        adj=None
+        if len(ps) <= 0: 
+            for row in range(raw_gw):
+                for col in range(raw_gw):
+                    ps.append(np.array([0.5,0.5])+[row,col])
+            pos = np.vstack(ps)
+            idcs = np.arange(len(pos))
+            adj = np.vstack([ [idcs[i], idcs[i]] for i in range(len(pos)) ])
+
+        else:  
+            pos = np.vstack(ps)
+            lj = len(act.position_l)
+            idcs = np.arange(len(pos))
+            adj = np.vstack([ [idcs[i], idcs[i+1]] for i in idcs[idcs%lj!=(lj-1)] ])
+        
+        
+        gr.setData(pos=pos, adj=adj,  size=2 )
+
+
+        if self.robot.gs.goal_window_counter > self.robot.gs.GOAL_WINDOW*(98/100.) :
             for g in range(self.robot.gs.N_ECHO_UNITS):
                 self.curves[g].setData(esn_data[g])
         

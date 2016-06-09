@@ -15,7 +15,8 @@ import utils.kinematics as KM
 
 class PerceptionManager:
     def __init__(self, pixels=[20,20], lims=[[0,1],[0,1]], 
-            epsilon=0.2, touch_th = 0.5, touch_sensors = 0):
+            epsilon=0.2, touch_th = 0.5, touch_sensors = 0, 
+            touch_sigma=0.2, touch_len=0.5):
 
         self.pixels = np.array(pixels)
         self.lims = np.vstack(lims) 
@@ -25,26 +26,25 @@ class PerceptionManager:
         self.bins = self.size/self.pixels
         self.chain = KM.Polychain()
         self.init_chains = []
-        self.touch_sigma =  .8 
+        self.touch_sigma =  touch_sigma 
         self.sigma =  self.size*0.1
         self.sigma[0] *=  0.2
         self.gm = GM(lims = np.hstack([self.lims,self.pixels.reshape(2,1)]))
         self.touch_sensors = touch_sensors 
         self.touch_th = touch_th
-        self.touch_len = .1
-        self.im_res = 10 
+        self.touch_len = touch_len 
+        self.image_resolution = 10 
 
         self.chain.set_chain(np.vstack(([-1,0],[1,0])))
-        self.sensors = self.chain.get_dense_chain(self.touch_sensors)       
-       
-      
+        self.sensors = self.chain.get_dense_chain(self.touch_sensors)        
     
     def get_image(self, body_tokens ):
 
         image = np.zeros(self.pixels)
+        
         for c in body_tokens:
             self.chain.set_chain(c)
-            dense_chain = self.chain.get_dense_chain(self.im_res)
+            dense_chain = self.chain.get_dense_chain(self.image_resolution)
             for point in dense_chain:
                 p = np.floor(((point -self.lims[:,0])/self.size)*self.pixels).astype("int")
                 if np.all(p<self.pixels) and np.all(p>0) :
@@ -162,8 +162,7 @@ class KinematicActuator :
 
 class SensorimotorController:
 
-    def __init__(self, pixels, lims, touch_th,  
-            touch_sensors = 0):
+    def __init__(self, pixels, lims, touch_th, **kargs):
 
         self.pixels = pixels 
         self.lims = lims
@@ -200,9 +199,8 @@ class SensorimotorController:
         self.init_body_tokens = (self.actuator.position_l[::-1],        
                                  self.actuator.position_r)
         
-        self.perc = PerceptionManager(pixels=self.pixels,
-                lims=self.lims,  epsilon=0.1, 
-                touch_th=touch_th, touch_sensors=touch_sensors)
+        self.perc = PerceptionManager(  epsilon=0.1, 
+                lims=lims, pixels=pixels, **kargs )
 
     def step(self, larm_delta_angles, rarm_delta_angles):
 

@@ -4,7 +4,7 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-Arm	../utils/kinematics.py	/^class Arm:$/;"	c	inherits:
+Arm	../utils/kinematics.py	/^class Arm(object):$/;"	c	inherits:object
 ESN	../nets/esn.py	/^class ESN(object):$/;"	c	inherits:object
 ETA	../nets/esn.py	/^    ETA = 50000.0$/;"	v
 GaussianMaker	../nets/kohonen.py	/^GaussianMaker = OptimizedGaussianMaker$/;"	v
@@ -35,7 +35,7 @@ __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	cla
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:OptimizedGaussianMaker	file:	access:private
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma, theta=0) :$/;"	m	class:TwoDimensionalGaussianMaker	file:	access:private
 __init__	../model/Controller.py	/^    def __init__(self) :$/;"	m	class:KinematicActuator	access:public
-__init__	../model/Controller.py	/^    def __init__(self, pixels, lims, touch_th, touch_sensors = 0):$/;"	m	class:SensorimotorController	access:public
+__init__	../model/Controller.py	/^    def __init__(self, pixels, lims, touch_th,  $/;"	m	class:SensorimotorController	access:public
 __init__	../model/Controller.py	/^    def __init__(self, pixels=[20,20], lims=[[0,1],[0,1]], $/;"	m	class:PerceptionManager	access:public
 __init__	../model/GoalMaker.py	/^    def __init__(self):$/;"	m	class:GoalTesterSim	access:public
 __init__	../model/GoalMaker.py	/^    def __init__(self, n_input_layers, n_singlemod_layers, n_hidden_layers, $/;"	m	class:GoalMaker	access:public
@@ -95,8 +95,7 @@ gauss2d_oriented	../utils/gauss_utils.py	/^def gauss2d_oriented(x,y,m1,m2,std_x,
 get_angle	../utils/kinematics.py	/^def get_angle(v1,v2) :$/;"	f	access:public
 get_arm_positions	../model/Robot.py	/^    def get_arm_positions(self) :$/;"	m	class:Robot	access:public
 get_dense_chain	../utils/kinematics.py	/^    def get_dense_chain(self, density) :$/;"	m	class:Polychain	access:public
-get_eye_pos_from_index	../model/GoalSelector.py	/^    def get_eye_pos_from_index(self, idx):      $/;"	m	class:GoalSelector	access:public
-get_goal_from_index	../model/GoalSelector.py	/^    def get_goal_from_index(self, idx):      $/;"	m	class:GoalSelector	access:public
+get_goal_from_index	../model/GoalSelector.py	/^    def get_goal_from_index(self,idx):$/;"	m	class:GoalSelector	access:public
 get_image	../model/Controller.py	/^    def get_image(self, body_tokens ):$/;"	m	class:PerceptionManager	access:public
 get_joint_positions	../utils/kinematics.py	/^    def get_joint_positions(self,  joint_angles  ):$/;"	m	class:Arm	access:public
 get_length	../utils/kinematics.py	/^    def get_length(self) :$/;"	m	class:Polychain	access:public
