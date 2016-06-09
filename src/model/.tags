@@ -35,7 +35,7 @@ __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	cla
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:OptimizedGaussianMaker	file:	access:private
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma, theta=0) :$/;"	m	class:TwoDimensionalGaussianMaker	file:	access:private
 __init__	../model/Controller.py	/^    def __init__(self) :$/;"	m	class:KinematicActuator	access:public
-__init__	../model/Controller.py	/^    def __init__(self, pixels, lims, touch_th,  $/;"	m	class:SensorimotorController	access:public
+__init__	../model/Controller.py	/^    def __init__(self, pixels, lims, touch_th, **kargs):$/;"	m	class:SensorimotorController	access:public
 __init__	../model/Controller.py	/^    def __init__(self, pixels=[20,20], lims=[[0,1],[0,1]], $/;"	m	class:PerceptionManager	access:public
 __init__	../model/GoalMaker.py	/^    def __init__(self):$/;"	m	class:GoalTesterSim	access:public
 __init__	../model/GoalMaker.py	/^    def __init__(self, n_input_layers, n_singlemod_layers, n_hidden_layers, $/;"	m	class:GoalMaker	access:public
@@ -56,11 +56,11 @@ __init__	../utils/kinematics.py	/^    def __init__(self,$/;"	m	class:Arm	access:
 abstraction_maps	../model/main.py	/^    abstraction_maps = GoalAbstractionMaps(main_app, robot)$/;"	v
 add_img	../model/main.py	/^    def add_img(self, win, row=None, col=None, $/;"	m	class:GoalAbstractionMaps	access:public
 alpha	../model/test_main.py	/^            alpha = 0.1,$/;"	v
-angle	../utils/kinematics.py	/^    angle = zeros(3)  $/;"	v
+angle	../utils/kinematics.py	/^    angle = zeros(3)  $/;"	v	class:Arm
 append_views	../model/main.py	/^    def append_views(self, items=1, row=None, col=None, $/;"	m	class:GoalAbstractionMaps	access:public
-arm	../utils/kinematics.py	/^    arm = Arm($/;"	v
+arm	../utils/kinematics.py	/^    arm = Arm($/;"	v	class:Arm
 ax	../model/test_main.py	/^    ax = fig.add_subplot(111,aspect="equal")$/;"	v
-ax	../utils/kinematics.py	/^    ax = fig.add_subplot(111)$/;"	v
+ax	../utils/kinematics.py	/^    ax = fig.add_subplot(111)$/;"	v	class:Arm
 ax1	../nets/esn.py	/^    ax1 = fig.add_subplot(211)$/;"	v
 ax2	../nets/esn.py	/^    ax2 = fig.add_subplot(212)$/;"	v
 chain	../model/test_main.py	/^    chain = KM.Polychain()$/;"	v
@@ -75,21 +75,21 @@ color	../model/test_main.py	/^            color=[.6,.8,.6],$/;"	v
 color	../model/test_main.py	/^            color=[.8,.6,.6],$/;"	v
 color	../model/test_main.py	/^            color=[.8,.8,.8],$/;"	v
 controller	../model/test_main.py	/^    controller = Controller.SensorimotorController()$/;"	v
-dense_points	../utils/kinematics.py	/^    dense_points = scatter(*zeros([2,25]), s= 20, c=[1,1,0]) # plot arm edges$/;"	v
+dense_points	../utils/kinematics.py	/^    dense_points = scatter(*zeros([2,25]), s= 20, c=[1,1,0]) # plot arm edges$/;"	v	class:Arm
 dt	../model/test_main.py	/^            dt = 0.001,$/;"	v
 dtype	../model/main.py	/^            dtype=np.ubyte)$/;"	v	class:GoalAbstractionMaps
 dtype	../model/main.py	/^            dtype=np.ubyte)$/;"	v	class:GoalSelectionMaps
 echo	../nets/esn.py	/^    echo = ESN($/;"	v
 echo_activity	../nets/esn.py	/^    echo_activity = ax2.imshow(np.zeros([echo.STIME, N]),$/;"	v
-edges	../utils/kinematics.py	/^    edges = ax.scatter(*pos.T) # plot arm edges$/;"	v
+edges	../utils/kinematics.py	/^    edges = ax.scatter(*pos.T) # plot arm edges$/;"	v	class:Arm
 epsilon	../model/test_main.py	/^            epsilon = 1.0e-10,$/;"	v
 eta	../model/test_main.py	/^            eta = 0.01$/;"	v
 eta	../model/test_main.py	/^            eta = 0.01,$/;"	v
 evaluate_rho	../nets/esn.py	/^def evaluate_rho(m):$/;"	f	access:public
-external_point	../utils/kinematics.py	/^    external_point = scatter(*point, s= 30, c="r") # plot arm edges$/;"	v
+external_point	../utils/kinematics.py	/^    external_point = scatter(*point, s= 30, c="r") # plot arm edges$/;"	v	class:Arm
 fig	../model/test_main.py	/^    fig = plt.figure()$/;"	v
 fig	../nets/esn.py	/^    fig = plt.figure(figsize=(5,10))$/;"	v
-fig	../utils/kinematics.py	/^    fig = figure("arm")$/;"	v
+fig	../utils/kinematics.py	/^    fig = figure("arm")$/;"	v	class:Arm
 g2e_spars	../model/test_main.py	/^            g2e_spars = 0.01,$/;"	v
 gauss2d_oriented	../utils/gauss_utils.py	/^def gauss2d_oriented(x,y,m1,m2,std_x, std_y, theta) :$/;"	f	access:public
 get_angle	../utils/kinematics.py	/^def get_angle(v1,v2) :$/;"	f	access:public
@@ -187,9 +187,9 @@ output_lr	../model/test_main.py	/^            output_lr=0.1,$/;"	v
 paintEvent	../model/main.py	/^    def paintEvent(self, event):$/;"	m	class:KinematicsView	access:public
 paint_arm	../model/main.py	/^        def paint_arm(curr_pos, curr_color, curr_width):$/;"	f	function:KinematicsView.paintEvent	access:public
 pathname	../model/main.py	/^pathname = os.path.dirname(sys.argv[0])$/;"	v
-point	../utils/kinematics.py	/^    point = poly.get_point(0.75)$/;"	v
+point	../utils/kinematics.py	/^    point = poly.get_point(0.75)$/;"	v	class:Arm
 poly	../model/main.py	/^    def poly(self, pts):$/;"	m	class:KinematicsView	access:public
-poly	../utils/kinematics.py	/^    poly = Polychain()$/;"	v
+poly	../utils/kinematics.py	/^    poly = Polychain()$/;"	v	class:Arm
 pos	../model/main.py	/^    pos = np.array([0.0, 1.0])$/;"	v	class:GoalAbstractionMaps
 pos	../model/main.py	/^    pos = np.array([0.0, 1.0])$/;"	v	class:GoalSelectionMaps
 randomize	../nets/esn.py	/^    def randomize(self) :$/;"	m	class:ESN	access:public
@@ -258,5 +258,5 @@ touch	../model/test_main.py	/^    touch = False$/;"	v
 trial_window	../model/test_main.py	/^    trial_window = gs.RESET_WINDOW + gs.GOAL_WINDOW$/;"	v
 ts	../model/test_main.py	/^    ts = tl_lt\/float(trial_window)$/;"	v
 update_target	../model/GoalSelector.py	/^    def update_target(self):$/;"	m	class:GoalSelector	access:public
-xl	../utils/kinematics.py	/^    xl = [-4,4]    # x-axis limits$/;"	v
-yl	../utils/kinematics.py	/^    yl = [-4,4]    #y-axis limits$/;"	v
+xl	../utils/kinematics.py	/^    xl = [-4,4]    # x-axis limits$/;"	v	class:Arm
+yl	../utils/kinematics.py	/^    yl = [-4,4]    #y-axis limits$/;"	v	class:Arm

@@ -25,7 +25,7 @@ class Robot :
                 touch_len=0.6
                 )
 
-        self.GOAL_NUMBER = 16
+        self.GOAL_NUMBER = 49
 
         self.gs = GoalSelector.GoalSelector(
                 dt = 0.001,
