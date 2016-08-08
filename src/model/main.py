@@ -228,7 +228,7 @@ class GoalAbstractionMaps(pg.GraphicsView):
          
 	super(GoalAbstractionMaps, self).__init__()
         self.robot = robot
-        self.ts_duration = 100 
+        self.ts_duration = 1 
         self.main_app = app
 
 	self.setWindowTitle("Maps")
@@ -435,7 +435,9 @@ class GoalSelectionMaps(pg.GraphicsView):
    
         view = layout.addViewBox(row=0,col=2,colspan=1)   
         self.plot4 = pg.ImageItem(border='w',lut=self.lut)
+        self.plot6 = pg.ScatterPlotItem()
         view.addItem(self.plot4)
+        view.addItem(self.plot6)
         view.setAspectLocked(lock=True, ratio=1)       
         
         self.plot5view = layout.addViewBox(row=0,col=3, colspan=2)
@@ -470,10 +472,9 @@ class GoalSelectionMaps(pg.GraphicsView):
         
         self.setGeometry(self.LEFT, self.TOP, self.WIDTH, self.HEIGHT)
 
-
     def timerEvent(self, event):
         
-        (gmask, gv, gw, gr, targets, 
+        (gmask, gv, gw, gr, matched,  targets, 
                 target_position, 
                 esn_data ) = self.robot.get_selection_arrays() 
     
@@ -481,11 +482,13 @@ class GoalSelectionMaps(pg.GraphicsView):
         raw_gw = int(np.sqrt(goals))
         self.plot1.setImage( 0.6*gw.reshape(raw_gw, raw_gw) 
             +0.4*gr.reshape(raw_gw, raw_gw) , levels=(0,1) )
-       
         self.plot3.setImage( (gmask).reshape(raw_gw, raw_gw), levels=(0,1) ) 
-        self.plot4.setImage( (targets).reshape(raw_gw, raw_gw), levels=(0,1) ) 
         
-        
+        targets = (targets).reshape(raw_gw, raw_gw)
+        self.plot4.setImage( targets, levels=(0,1) ) 
+        points = np.vstack(np.where(targets>0)) +0.5
+        self.plot6.setData(*points)
+
         gr  = self.plot5
         lims = self.robot.controller.perc.lims
         rngs = lims[:,1]-lims[:,0]
@@ -525,14 +528,12 @@ class GoalSelectionMaps(pg.GraphicsView):
             lj = len(act.position_l)
             idcs = np.arange(len(pos))
             adj = np.vstack([ [idcs[i], idcs[i+1]] for i in idcs[idcs%lj!=(lj-1)] ])
-        
-        
+          
         gr.setData(pos=pos, adj=adj,  size=2 )
 
-
-        if self.robot.gs.goal_window_counter > self.robot.gs.GOAL_WINDOW*(98/100.) :
-            for g in range(self.robot.gs.N_ECHO_UNITS):
-                self.curves[g].setData(esn_data[g])
+        # if self.robot.gs.goal_window_counter > self.robot.gs.GOAL_WINDOW*(98/100.) :
+        for g in range(self.robot.gs.N_ECHO_UNITS):
+            self.curves[g].setData(esn_data[g])
         
         self.update()
 
@@ -566,7 +567,7 @@ class KinematicsView(QtGui.QWidget):
 
 	self.setWindowTitle("Kinematics")
 
-        self.ts_duration = 100
+        self.ts_duration = 10
         self.time_id = self.startTimer(self.ts_duration)
     
     def resetWindow(self):
@@ -645,6 +646,7 @@ class KinematicsView(QtGui.QWidget):
 
 
         # paint arm
+        
         curr_color = QtGui.QColor(255,100,100)
         curr_width = 3.0
 
@@ -665,7 +667,7 @@ class KinematicsView(QtGui.QWidget):
  
         curr_color = QtCore.Qt.black
         curr_width = 1
- 
+
         curr_pos = real_l_pos
         paint_arm(curr_pos, curr_color, curr_width)
            
@@ -715,15 +717,35 @@ class KinematicsView(QtGui.QWidget):
 
 ## Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-    
+   
+    import argparse
+    parser = argparse.ArgumentParser() 
+    parser.add_argument('-g','--graphics',
+            help="Graphics on",
+            action="store_true", default=False) 
+    parser.add_argument('-t','--stime',
+            help="Simpulation time (only for graphics off)",
+            action="store", default=2000)  
+    args = parser.parse_args()
+    GRAPHICS = bool(args.graphics) 
+    STIME = int(args.stime) 
+
     robot = Robot()
 
-    main_app = QtGui.QApplication([])
-    abstraction_maps = GoalAbstractionMaps(main_app, robot)
-    selection_maps = GoalSelectionMaps(main_app, robot)
-    kin = KinematicsView(main_app, robot)
-    main = Main(main_app, abstraction_maps, selection_maps, kin, robot)
+    if GRAPHICS :
 
-    if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-        QtGui.QApplication.instance().exec_()
+        main_app = QtGui.QApplication([])
+        abstraction_maps = GoalAbstractionMaps(main_app, robot)
+        selection_maps = GoalSelectionMaps(main_app, robot)
+        kin = KinematicsView(main_app, robot)
+        main = Main(main_app, abstraction_maps, selection_maps, kin, robot)
+
+        if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
+            QtGui.QApplication.instance().exec_()
+
+    else:
+
+        for t in range(STIME):
+            robot.step()
+
 

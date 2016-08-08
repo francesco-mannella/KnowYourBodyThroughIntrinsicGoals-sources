@@ -7,6 +7,7 @@ sys.path.append("../")
 import numpy as np
 import numpy.random as rnd
 from nets.esn import ESN
+import utils.kinematics as KM
 
 def softmax(x, t=0.1):
     '''
@@ -140,6 +141,8 @@ class GoalSelector :
         self.t = 0
 
 
+        self.pid = KM.PID(n=self.N_ROUT_UNITS);
+
     def goal_index(self):
 
         if  np.sum(self.goal_win)>0:
@@ -228,6 +231,7 @@ class GoalSelector :
             self.reset_window_counter = 0
             self.echonet.reset()
             self.echonet.reset_data()
+            self.pid.reset()
     
     def step(self, inp):
         '''
@@ -260,7 +264,8 @@ class GoalSelector :
             curr_match = 0.0
  
         added_signal = self.NOISE*oscillator(self.t, 10, self.random_oscil)[0]
-        self.out = self.read_out + (1.0 - curr_match)*added_signal 
+        #self.out = self.pid.step(self.out, self.read_out + (1.0 - curr_match)*added_signal)
+        self.out = self.read_out + (1.0 - curr_match)*added_signal
         self.tout = self.read_out 
         self.t += 1
 
@@ -273,7 +278,7 @@ class GoalSelector :
             if self.target_position.has_key(goalwin_idx):
                 target = self.target_position[goalwin_idx]
                 x = self.inp
-                y = self.read_out
+                y = self.tout
                 eta = self.ETA
                 w = self.echo2out_w
                 w += eta*np.outer(target-y,x)
