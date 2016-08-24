@@ -78,6 +78,8 @@ class Robot :
         self.static_inp = np.zeros(self.gs.N_INPUT)
         
         self.collision = False
+
+        self.log = open("../../log", "w")
    
     def get_selection_arrays(self) :
 
@@ -229,6 +231,15 @@ class Robot :
             
             if self.match_value ==1 or self.gs.goal_window_counter >= self.gs.GOAL_WINDOW:
                
+                stouch = ""
+                for touch in  self.controller.touches :
+                    stouch += "{:6.4f} ".format(touch)
+                
+                stouch += "{:6d} ".format(np.argmax(self.gs.goal_win))
+
+                self.log.write( stouch + "\n")
+                self.log.flush()
+
                 self.gp.learn(self.match_value) 
 
                 if self.match_value == 1:

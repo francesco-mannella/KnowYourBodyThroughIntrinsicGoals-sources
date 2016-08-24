@@ -7,6 +7,7 @@
 Arm	../utils/kinematics.py	/^class Arm(object):$/;"	c	inherits:object
 ESN	../nets/esn.py	/^class ESN(object):$/;"	c	inherits:object
 ETA	../nets/esn.py	/^    ETA = 50000.0$/;"	v
+GRAPHICS	../model/main.py	/^    GRAPHICS = bool(args.graphics) $/;"	v
 GaussianMaker	../nets/kohonen.py	/^GaussianMaker = OptimizedGaussianMaker$/;"	v
 GoalAbstractionMaps	../model/main.py	/^class GoalAbstractionMaps(pg.GraphicsView):$/;"	c	inherits:pg.GraphicsView
 GoalMaker	../model/GoalMaker.py	/^class GoalMaker(object):$/;"	c	inherits:object
@@ -28,6 +29,7 @@ PID	../utils/kinematics.py	/^class PID:$/;"	c	inherits:
 PerceptionManager	../model/Controller.py	/^class PerceptionManager:$/;"	c	inherits:
 Polychain	../utils/kinematics.py	/^class Polychain :$/;"	c	inherits:
 Robot	../model/Robot.py	/^class Robot :$/;"	c	inherits:
+STIME	../model/main.py	/^    STIME = int(args.stime) $/;"	v
 SensorimotorController	../model/Controller.py	/^class SensorimotorController:$/;"	c	inherits:
 TRIALS	../nets/esn.py	/^    TRIALS = 200 $/;"	v
 TwoDimensionalGaussianMaker	../utils/gauss_utils.py	/^class TwoDimensionalGaussianMaker:$/;"	c	inherits:
@@ -55,11 +57,11 @@ __init__	../utils/gauss_utils.py	/^    def __init__(self, lims) :$/;"	m	class:Op
 __init__	../utils/gauss_utils.py	/^    def __init__(self, lims) :$/;"	m	class:TwoDimensionalGaussianMaker	access:public
 __init__	../utils/kinematics.py	/^    def __init__(self, n=1, dt=0.1, Kp=0.1, Ki=0.9, Kd=0.001 ):$/;"	m	class:PID	access:public
 __init__	../utils/kinematics.py	/^    def __init__(self,$/;"	m	class:Arm	access:public
-abstraction_maps	../model/main.py	/^    abstraction_maps = GoalAbstractionMaps(main_app, robot)$/;"	v
 add_img	../model/main.py	/^    def add_img(self, win, row=None, col=None, $/;"	m	class:GoalAbstractionMaps	access:public
 alpha	../model/test_main.py	/^            alpha = 0.1,$/;"	v
 angle	../utils/kinematics.py	/^    angle = zeros(6)  $/;"	v	class:Arm
 append_views	../model/main.py	/^    def append_views(self, items=1, row=None, col=None, $/;"	m	class:GoalAbstractionMaps	access:public
+args	../model/main.py	/^    args = parser.parse_args()$/;"	v
 arm	../utils/kinematics.py	/^    arm = Arm($/;"	v	class:Arm
 autocollision	../utils/kinematics.py	/^    def autocollision(self, epsilon = 0.1, is_set_collinear=False):$/;"	m	class:Polychain	access:public
 ax	../model/test_main.py	/^    ax = fig.add_subplot(111,aspect="equal")$/;"	v
@@ -143,7 +145,6 @@ im_value	../model/test_main.py	/^    im_value = 0.0$/;"	v
 inp_dim	../model/test_main.py	/^    inp_dim = controller.pixels[0]*controller.pixels[1]$/;"	v
 inp_w	../nets/esn.py	/^    inp_w = 0.5*np.ones([N, l_target])*(np.random.rand(N, l_target)<0.1)$/;"	v
 isPointInChain	../utils/kinematics.py	/^    def isPointInChain(self, point, epsilon = 0.1 ) :$/;"	m	class:Polychain	access:public
-kin	../model/main.py	/^    kin = KinematicsView(main_app, robot)$/;"	v
 l_target	../nets/esn.py	/^    l_target = len(target)$/;"	v
 larm_angles	../model/test_main.py	/^                larm_angles=np.pi*gs.out[:(gs.N_ROUT_UNITS\/2)],$/;"	v
 learn	../model/GoalMaker.py	/^    def learn(self):$/;"	m	class:GoalMaker	access:public
@@ -158,8 +159,6 @@ line	../utils/gauss_utils.py	/^    line = ""$/;"	v
 lut	../model/main.py	/^    lut = cmap.getLookupTable(0.0, 1.0, 256)$/;"	v	class:GoalAbstractionMaps
 lut	../model/main.py	/^    lut = cmap.getLookupTable(0.0, 1.0, 256)$/;"	v	class:GoalSelectionMaps
 m	../utils/gauss_utils.py	/^    m = arange(15).reshape(3,5)$/;"	v
-main	../model/main.py	/^    main = Main(main_app, abstraction_maps, selection_maps, kin, robot)$/;"	v
-main_app	../model/main.py	/^    main_app = QtGui.QApplication([])$/;"	v
 map1DND	../utils/gauss_utils.py	/^def map1DND(x,nDim,nBin) :$/;"	f	access:public
 mapND1D	../utils/gauss_utils.py	/^def mapND1D(idcs,nBin) :$/;"	f	access:public
 match	../model/GoalPredictor.py	/^def match(abstaction_layer, selection_layer) :$/;"	f	access:public
@@ -190,6 +189,7 @@ oscillator	../model/GoalSelector.py	/^def oscillator(x, scale, p) :$/;"	f	access
 output_lr	../model/test_main.py	/^            output_lr=0.1,$/;"	v
 paintEvent	../model/main.py	/^    def paintEvent(self, event):$/;"	m	class:KinematicsView	access:public
 paint_arm	../model/main.py	/^        def paint_arm(curr_pos, curr_color, curr_width):$/;"	f	function:KinematicsView.paintEvent	access:public
+parser	../model/main.py	/^    parser = argparse.ArgumentParser() $/;"	v
 pathname	../model/main.py	/^pathname = os.path.dirname(sys.argv[0])$/;"	v
 point	../utils/kinematics.py	/^    point = poly.get_point(0.75)$/;"	v	class:Arm
 poly	../model/main.py	/^    def poly(self, pts):$/;"	m	class:KinematicsView	access:public
@@ -220,7 +220,6 @@ rout_real	../nets/esn.py	/^    rout_real = np.zeros(N_OUT) $/;"	v
 run_colors	../nets/kohonen_colors.py	/^def run_colors() :     $/;"	f	access:public
 rwl	../model/test_main.py	/^    rwl = ts*gs.RESET_WINDOW$/;"	v
 scaled_grid	../utils/gauss_utils.py	/^def scaled_grid(idcs, lims) :$/;"	f	access:public
-selection_maps	../model/main.py	/^    selection_maps = GoalSelectionMaps(main_app, robot)$/;"	v
 set_angles	../model/Controller.py	/^    def set_angles(self, angles_l, angles_r) :$/;"	m	class:KinematicActuator	access:public
 set_chain	../utils/kinematics.py	/^    def set_chain(self, chain) :$/;"	m	class:Polychain	access:public
 sigma	../nets/esn.py	/^    sigma = 0.6$/;"	v

@@ -1,6 +1,9 @@
 
-./GoalMakerNoRep.py
+./Controller.py
+./GoalMaker.py
+./GoalPredictor.py
 ./GoalSelector.py
+./Robot.py
 ./__init__.py
-./plotter.py
-./simulator.py
+./main.py
+./test_main.py

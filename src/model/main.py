@@ -714,6 +714,7 @@ class KinematicsView(QtGui.QWidget):
 #################################################################
 #################################################################
 
+import progressbar
 
 ## Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
@@ -744,8 +745,14 @@ if __name__ == '__main__':
             QtGui.QApplication.instance().exec_()
 
     else:
-
+        bar = progressbar.ProgressBar( 
+                maxval=STIME, 
+                widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()],
+                term_width=30)
+        
+        bar.start()
         for t in range(STIME):
             robot.step()
-
+            bar.update(t+1)
+        bar.finish()
 

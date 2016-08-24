@@ -46,9 +46,4 @@ class GoalPredictor :
         
         self.w += self.ETA*self.goal_win*(match - self.out)
         self.prediction_error = np.maximum(0.0, match - self.out)
-        print 
-        print "GoalPredictor:50" 
-        print "pe={:f}".format(self.prediction_error)
-        print self.w.reshape(np.sqrt(self.N_GOAL_UNITS), np.sqrt(self.N_GOAL_UNITS))
-
 

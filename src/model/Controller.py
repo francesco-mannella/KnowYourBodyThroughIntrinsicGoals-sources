@@ -110,7 +110,7 @@ class PerceptionManager:
             g = self.gm(point, 1e-5+touch*self.sigma )[0]
             image += g.reshape(*self.pixels)*(touch>self.touch_th)
          
-        return image.T
+        return image.T, touches
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -266,7 +266,7 @@ class SensorimotorController:
             self.prop = self.perc.get_proprioception(
                     angles_tokens=angles_tokens)
             #TOUCH
-            self.touch = self.perc.get_touch(body_tokens=curr_body_tokens)
+            self.touch, self.touches = self.perc.get_touch(body_tokens=curr_body_tokens)
 
         else :
             self.larm_delta_angles  = self.larm_delta_angles_prev
