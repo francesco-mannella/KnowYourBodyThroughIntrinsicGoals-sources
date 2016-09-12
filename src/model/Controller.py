@@ -13,7 +13,7 @@ import utils.kinematics as KM
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 
-class PerceptionManager:
+class PerceptionManager(object) :
     def __init__(self, pixels=[20,20], lims=[[0,1],[0,1]], 
             epsilon=0.2, touch_th = 0.5, touch_sensors = 0, 
             touch_sigma=0.2, touch_len=0.5):
@@ -111,7 +111,7 @@ class PerceptionManager:
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 
-class KinematicActuator :
+class KinematicActuator(object) :
 
     #-------------------------------------------------------------------------
     #-------------------------------------------------------------------------
@@ -167,7 +167,7 @@ class KinematicActuator :
 #-----------------------------------------------------------------------------
 
 
-class SensorimotorController:
+class SensorimotorController(object) :
 
     def __init__(self, pixels, lims, touch_th, **kargs):
 

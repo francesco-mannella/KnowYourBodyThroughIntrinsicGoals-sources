@@ -18,7 +18,7 @@ def match(abstaction_layer, selection_layer) :
 
     return np.any( np.logical_and(al>0,gl>0) )
 
-class GoalPredictor :
+class GoalPredictor(object) :
 
     def __init__(self, n_goal_units, eta) :
         '''

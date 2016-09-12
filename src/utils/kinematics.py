@@ -61,7 +61,7 @@ def get_angle(v1,v2) :
 
 
 # Manages distances on a polynomial chain
-class Polychain :
+class Polychain(object) :
 
     # floating point precision
     HVERSOR = np.array([1,0])
@@ -235,7 +235,7 @@ class Polychain :
 #----------------------------------------------------------------------
 
 
-class PID:
+class PID(object) :
 
     def __init__(self, n=1, dt=0.1, Kp=0.1, Ki=0.9, Kd=0.001 ):
        

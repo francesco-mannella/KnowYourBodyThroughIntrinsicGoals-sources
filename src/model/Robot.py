@@ -9,7 +9,7 @@ import Controller
 import utils.kinematics as KM
 
 
-class Robot :
+class Robot(object) :
 
     def __init__(self) :
     
@@ -84,9 +84,9 @@ class Robot :
         
         self.collision = False
 
-        self.log_sensors = open("../../log_sensors", "w")
-        self.log_position = open("../../log_position", "w")
-   
+        self.log_sensors = None
+        self.log_position = None 
+
     def get_selection_arrays(self) :
 
         sel = self.gs.goal_selected
@@ -237,30 +237,35 @@ class Robot :
             
             if self.match_value ==1 or self.gs.goal_window_counter >= self.gs.GOAL_WINDOW:
                
-                # save match info on file 
 
-                # create log line
-                log_string = ""
-                # add touch info
-                for touch in  self.controller.touches :
-                    log_string += "{:6.4f} ".format(touch)
-                # add goal index
-                log_string += "{:6d} ".format(np.argmax(self.gs.goal_win)) 
-                # save to file
-                self.log_sensors.write( log_string + "\n")
-                self.log_sensors.flush()
-        
-                # create log line
-                log_string = ""
-                # add position info
-                curr_position =  np.vstack(self.controller.curr_body_tokens).ravel() 
-                for pos in  curr_position:
-                    log_string += "{:6.4f} ".format(pos)
-                # add goal index
-                log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
-                # save to file
-                self.log_position.write( log_string + "\n")
-                self.log_position.flush()
+                if self.log_sensors is not None :
+
+                    # save match info on file 
+
+                    # create log line
+                    log_string = ""
+                    # add touch info
+                    for touch in  self.controller.touches :
+                        log_string += "{:6.4f} ".format(touch)
+                    # add goal index
+                    log_string += "{:6d} ".format(np.argmax(self.gs.goal_win)) 
+                    # save to file
+                    self.log_sensors.write( log_string + "\n")
+                    self.log_sensors.flush()
+            
+                if self.log_position is not None :
+
+                    # create log line
+                    log_string = ""
+                    # add position info
+                    curr_position =  np.vstack(self.controller.curr_body_tokens).ravel() 
+                    for pos in  curr_position:
+                        log_string += "{:6.4f} ".format(pos)
+                    # add goal index
+                    log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
+                    # save to file
+                    self.log_position.write( log_string + "\n")
+                    self.log_position.flush()
 
 
                 # learn

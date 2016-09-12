@@ -5,6 +5,8 @@
 import os
 import sys
 import copy
+import cPickle as pickle
+import gzip
 
 # working dir is the base dir of this file
 pathname = os.path.dirname(sys.argv[0])
@@ -46,15 +48,37 @@ if __name__ == '__main__':
     parser.add_argument('-g','--graphics',
             help="Graphics on",
             action="store_true", default=False) 
+    parser.add_argument('-d','--dump',
+            help="dump the robot object",
+            action="store_true", default=False) 
+    parser.add_argument('-l','--load',
+            help="load the robot object",
+            action="store_true", default=False) 
     parser.add_argument('-t','--stime',
-            help="Simpulation time (only for graphics off)",
+            help="Simulation time (only for graphics off)",
             action="store", default=2000)  
     args = parser.parse_args()
     GRAPHICS = bool(args.graphics) 
-    STIME = int(args.stime) 
+    STIME = int(args.stime)  
+    DUMP = int(args.dump) 
+    LOAD = int(args.load) 
 
-    robot = Robot()
+    log_sensors = open("../../log_sensors", "w")
+    log_position = open("../../log_position", "w")
+        
+    dumpfile = "dumped_robot"
 
+    if LOAD :
+        print "loading ..."
+        with gzip.open(dumpfile, 'rb') as f:
+            robot = pickle.load(f)
+    else :
+        robot = Robot()
+
+    robot.log_sensors = log_sensors
+    robot.log_position = log_position
+    
+    print "simulating ..."
     if GRAPHICS :
 
         import plotter 
@@ -72,4 +96,13 @@ if __name__ == '__main__':
             robot.step()
             bar.update(t+1)
         bar.finish()
+
+    if DUMP :
+        
+        print "dumping ..."
+        with gzip.open(dumpfile, 'wb') as f:
+            robot.log_sensors = None
+            robot.log_position = None
+            robot = pickle.dump(robot, f)
+
 

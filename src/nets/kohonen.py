@@ -14,7 +14,7 @@ from utils.gauss_utils import *
 #------------------------------------------------------------
 GaussianMaker = OptimizedGaussianMaker
 
-class Kohonen :  
+class Kohonen(object) :
 
     def __init__(self,
             stime               = 400,
