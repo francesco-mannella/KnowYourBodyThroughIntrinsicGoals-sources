@@ -27,7 +27,6 @@ sys.excepthook = my_excepthook
 ################################################################
 
 import numpy as np
-import plotter 
 from Robot import Robot
 
 np.set_printoptions(edgeitems=3, linewidth=999,  precision=3,
@@ -58,6 +57,7 @@ if __name__ == '__main__':
 
     if GRAPHICS :
 
+        import plotter 
         plotter.graph_main(robot)
         
     else:
