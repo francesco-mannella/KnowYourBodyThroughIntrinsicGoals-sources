@@ -76,7 +76,7 @@ def scaled_grid(idcs, lims) :
     return scaled 
 
 
-class MultidimensionalGaussianMaker:
+class MultidimensionalGaussianMaker(object) :
     
     def __init__(self, lims) :
 
@@ -97,7 +97,7 @@ class MultidimensionalGaussianMaker:
     
 
 
-class TwoDimensionalGaussianMaker:
+class TwoDimensionalGaussianMaker(object) :
 
     def __init__(self, lims) :
 
@@ -128,7 +128,7 @@ class TwoDimensionalGaussianMaker:
         
         return res.T.ravel(), [self.X, self.Y]
 
-class OneDimensionalGaussianMaker:
+class OneDimensionalGaussianMaker(object) :
 
     def __init__(self, lims) :
         self.x = np.linspace(*lims[0])
@@ -137,7 +137,7 @@ class OneDimensionalGaussianMaker:
 
         return np.exp((-(self.x-mu)**2)/(sigma**2)), self.x
 
-class OptimizedGaussianMaker:
+class OptimizedGaussianMaker(object) :
    
     def __init__(self, lims) :
         L = len(lims)

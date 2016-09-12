@@ -35,7 +35,7 @@ def oscillator(x, scale, p) :
     return 0.5*np.pi*np.cos(pam*np.pi*(x/scale-pph))
 
 
-class GoalSelector :
+class GoalSelector(object) :
 
     def __init__(self, dt, tau, alpha, epsilon, eta, n_input,
             n_goal_units, n_echo_units, n_rout_units,
