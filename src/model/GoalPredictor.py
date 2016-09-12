@@ -40,13 +40,10 @@ class GoalPredictor :
     def step(self, goal_win):
 
         self.goal_win = goal_win
-        self.out = np.sum(self.w*self.out)
+        self.out = np.dot(self.w,self.goal_win)
 
     def learn(self, match):
         
         self.w += self.ETA*self.goal_win*(match - self.out)
         self.prediction_error = np.maximum(0.0, match - self.out)
-    
-
-
 

@@ -1,9 +1,6 @@
 import sys
 sys.path.append("../")
-
 import numpy as np
-import numpy.random as rnd
-import matplotlib.pyplot as plt
 
 import GoalSelector
 import GoalPredictor
@@ -20,22 +17,24 @@ class Robot :
                 pixels = [20, 20],
                 lims = [[-5, 5], [-2, 4.]],
                 touch_th = 0.8, 
-                touch_sensors = 0,
-                fovea_radius = .3)
+                touch_sensors = 18,
+                touch_sigma=0.25, 
+                touch_len=0.01
+                )
 
-        self.GOAL_NUMBER = 9
+        self.GOAL_NUMBER = 49
 
         self.gs = GoalSelector.GoalSelector(
                 dt = 0.001,
-                tau = 0.008,
-                alpha = 0.1,
+                tau = 0.015,
+                alpha = 0.4,
                 epsilon = 1.0e-10,
                 eta = 0.04,
                 n_input = self.controller.pixels[0]*self.controller.pixels[0],
                 n_goal_units = self.GOAL_NUMBER,
                 n_echo_units = 100,
                 n_rout_units = self.controller.actuator.NUMBER_OF_JOINTS*2,
-                im_decay = 0.5,
+                im_decay = 0.9,
                 match_decay = 0.5,
                 noise = .5,
                 sm_temp = 0.2,
@@ -47,26 +46,31 @@ class Robot :
                 )
 
         self.gp = GoalPredictor.GoalPredictor(
-                n_goal_units = 2,
+                n_goal_units = self.GOAL_NUMBER,
                 eta = 0.01
                 )
 
+       
         inp_dim = self.controller.pixels[0]*self.controller.pixels[1]
+        
+        self.stime = 10000
+        
         self.gm = GoalMaker.GoalMaker(
                 n_input_layers=[inp_dim, inp_dim, inp_dim],
                 n_singlemod_layers= [64, 64, 64],
                 n_hidden_layers=[16, 16],
                 n_out=16,
                 n_goalrep= self.GOAL_NUMBER,
-                singlemod_lrs = [0.05, 0.05, 0.05],
+                singlemod_lrs = [0.05, 0.01, 0.1],
                 hidden_lrs=[0.001, 0.001],
                 output_lr=0.001,
-                goalrep_lr=0.001,
-                goal_th=0.1
+                goalrep_lr=0.8,
+                goal_th=0.1,
+                stime=self.stime,
+                single_kohonen = True
             )
 
 
-        self.stime = 10000
 
         self.trial_window = self.gs.RESET_WINDOW + self.gs.GOAL_WINDOW
         
@@ -77,9 +81,12 @@ class Robot :
         self.intrinsic_motivation_value = 0.0
     
         self.static_inp = np.zeros(self.gs.N_INPUT)
-   
-        self.eye_pos = np.zeros(2)
+        
+        self.collision = False
 
+        self.log_sensors = open("../../log_sensors", "w")
+        self.log_position = open("../../log_position", "w")
+   
     def get_selection_arrays(self) :
 
         sel = self.gs.goal_selected
@@ -93,20 +100,12 @@ class Robot :
         acquired_targets = []
         if len(goal_keys) != 0:
             acquired_targets = self.gs.get_goal_from_index(self.gs.target_position.keys()) 
-            acquired_eye_poss = self.gs.get_eye_pos_from_index(self.gs.target_position.keys())
-       
-            g = np.vstack(( acquired_targets, np.vstack(acquired_eye_poss).T )).T
-
-            for r in g:
-                print "Robot:100  goal: {}  x: {}  y: {}".format(*r)
-            print
-
-        targets = np.array([ 1.0*(target in acquired_targets) 
+        matched_targets = np.array([ 1.0*(target in acquired_targets) 
             for target in np.arange(self.gs.N_GOAL_UNITS) ])
+        targets = self.gp.w
         esn_data = self.gs.echonet.data[self.gs.echonet.out_lab]
-
-        
-        return gmask, gv, gw, gr, targets, self.gs.target_position, \
+ 
+        return gmask, gv, gw, gr,matched_targets, targets, self.gs.target_position, \
                 esn_data 
         
 
@@ -152,8 +151,7 @@ class Robot :
         sensors = self.controller.perc.sensors * sel
 
         return (real_l_pos, real_r_pos, target_l_pos,
-                target_r_pos, theor_l_pos, theor_r_pos, sensors, 
-                self.eye_pos, self.controller.fovea_radius )
+                target_r_pos, theor_l_pos, theor_r_pos, sensors )
 
     def step(self) :
    
@@ -166,8 +164,7 @@ class Robot :
             if any(self.goal_mask==True):
                 self.gs.goal_selection(
                         self.intrinsic_motivation_value, 
-                        self.goal_mask,
-                        eye_pos=self.eye_pos)
+                        self.goal_mask)
             else:
                 self.gs.goal_selection(self.intrinsic_motivation_value)
 
@@ -175,32 +172,48 @@ class Robot :
             if self.gs.goal_window_counter == 0:
                 self.gp.step(self.gs.goal_win) 
 
-            self.static_inp *= 0.0
+
+            self.gm_input = [
+                self.controller.pos_delta.ravel()*500.0 *0.0,
+                self.controller.prop_delta.ravel()*500.0*0.0,
+                self.controller.touch_delta.ravel()*5000.0]
+            self.static_inp *= 0
+            for inp in self.gm_input :
+                self.static_inp += 0.0001*np.array(inp)
 
         else:
             if self.gs.reset_window_counter == 0:
                 self.static_inp = np.random.rand(*self.static_inp.shape)
-                self.eye_pos = 0.1 + 0.8*(np.random.rand(2)*4).round(0)/4
+        
         # Movement
-
         self.gs.step( self.static_inp )
 
-        self.controller.step_kinematic(
-                larm_angles=np.pi*self.gs.out[:(self.gs.N_ROUT_UNITS/2)],
-                rarm_angles=np.pi*self.gs.out[(self.gs.N_ROUT_UNITS/2):],
-                larm_angles_theoric=np.pi*self.gs.tout[:(self.gs.N_ROUT_UNITS/2)],
-                rarm_angles_theoric=np.pi*self.gs.tout[(self.gs.N_ROUT_UNITS/2):],
-                larm_angles_target=np.pi*self.gs.gout[:(self.gs.N_ROUT_UNITS/2)],
-                rarm_angles_target=np.pi*self.gs.gout[(self.gs.N_ROUT_UNITS/2):],
-                eye_pos=self.eye_pos
+        larm_angles=np.pi*self.gs.out[:(self.gs.N_ROUT_UNITS/2)]
+        rarm_angles=np.pi*self.gs.out[(self.gs.N_ROUT_UNITS/2):]
+        larm_angles_theoric=np.pi*self.gs.tout[:(self.gs.N_ROUT_UNITS/2)]
+        rarm_angles_theoric=np.pi*self.gs.tout[(self.gs.N_ROUT_UNITS/2):]
+        larm_angles_target=np.pi*self.gs.gout[:(self.gs.N_ROUT_UNITS/2)]
+        rarm_angles_target=np.pi*self.gs.gout[(self.gs.N_ROUT_UNITS/2):]
+
+        collision = self.controller.step_kinematic(
+                larm_angles=larm_angles,
+                rarm_angles=rarm_angles,
+                larm_angles_theoric=larm_angles_theoric,
+                rarm_angles_theoric=rarm_angles_theoric,
+                larm_angles_target=larm_angles_target,
+                rarm_angles_target=rarm_angles_target,
+                active=(self.gs.reset_window_counter >= self.gs.RESET_WINDOW)
                 )
+        
+        self.collision = collision
+        if self.collision :
+            self.gs.out[:(self.gs.N_ROUT_UNITS/2)] = self.controller.larm_angles/np.pi
+            self.gs.out[(self.gs.N_ROUT_UNITS/2):] = self.controller.rarm_angles/np.pi
+   
 
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:
 
-            self.gm.step([
-                self.controller.pos_delta.ravel()*500.0,
-                self.controller.prop_delta.ravel()*.5,
-                self.controller.touch_delta.ravel()*5000.0])
+            self.gm.step( self.gm_input )
 
             self.gm.learn()
 
@@ -223,12 +236,43 @@ class Robot :
                     )
             
             if self.match_value ==1 or self.gs.goal_window_counter >= self.gs.GOAL_WINDOW:
-                
+               
+                # save match info on file 
+
+                # create log line
+                log_string = ""
+                # add touch info
+                for touch in  self.controller.touches :
+                    log_string += "{:6.4f} ".format(touch)
+                # add goal index
+                log_string += "{:6d} ".format(np.argmax(self.gs.goal_win)) 
+                # save to file
+                self.log_sensors.write( log_string + "\n")
+                self.log_sensors.flush()
+        
+                # create log line
+                log_string = ""
+                # add position info
+                curr_position =  np.vstack(self.controller.curr_body_tokens).ravel() 
+                for pos in  curr_position:
+                    log_string += "{:6.4f} ".format(pos)
+                # add goal index
+                log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
+                # save to file
+                self.log_position.write( log_string + "\n")
+                self.log_position.flush()
+
+
+                # learn
+
+                self.gp.learn(self.match_value) 
+
                 if self.match_value == 1:
                     self.gs.update_target()
                 
+                # update variables
+
                 self.intrinsic_motivation_value = self.gp.prediction_error 
-                
                 self.gs.goal_selected = False
                 self.gs.reset(match = self.match_value)
                 self.controller.reset()

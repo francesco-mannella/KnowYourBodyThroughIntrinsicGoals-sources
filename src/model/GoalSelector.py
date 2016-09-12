@@ -7,6 +7,7 @@ sys.path.append("../")
 import numpy as np
 import numpy.random as rnd
 from nets.esn import ESN
+import utils.kinematics as KM
 
 def softmax(x, t=0.1):
     '''
@@ -110,16 +111,7 @@ class GoalSelector :
                 (np.random.rand((1*unit_int),
                     self.N_INPUT+ self.N_GOAL_UNITS)<self.GOAL2ECHO_SPARSENESS)
 
-        # eye_pos -> ESN
-        self.EYE2ECHO_W = np.zeros([self.N_ECHO_UNITS, 2])
-        
-        self.EYE2ECHO_W[(1*unit_int):(2*unit_int), :] = \
-                np.random.randn((1*unit_int), 2)
-        
-        self.EYE2ECHO_W[(1*unit_int):(2*unit_int), :] *= \
-                (np.random.rand((1*unit_int),2)<self.GOAL2ECHO_SPARSENESS)
 
-      
         # goal_layer -> ESN
         self.GOAL2ECHO_W = np.zeros([self.N_ECHO_UNITS, 
             self.N_GOAL_UNITS])
@@ -148,60 +140,25 @@ class GoalSelector :
         self.random_oscil = np.random.rand(2*self.N_ROUT_UNITS)
         self.t = 0
 
-        self.eye_pos = np.zeros(2) 
+
+        self.pid = KM.PID(n=self.N_ROUT_UNITS);
 
     def goal_index(self):
 
-        if self.eye_pos is not None and np.sum(self.goal_win)>0:
+        if  np.sum(self.goal_win)>0:
             
-            goal = np.nonzero(self.goal_win>0)[0][0]
-            eye_x = np.round(1e5*self.eye_pos[0],0)
-            eye_y = np.round(1e5*self.eye_pos[1],0)
-         
-            idx = goal*1e16 + eye_x*1e8 + eye_y
-            
-            return idx
+            idx = np.nonzero(self.goal_win>0)[0][0]
+            return idx 
+
+    def get_goal_from_index(self,idx):
+        return idx
         
-    def get_goal_from_index(self, idx):      
-        if np.iterable(idx) == 0:  
-            return np.round(idx/1.0e16, 0)
-        else:
-            res = []
-            for i in idx:
-                ir = np.round(i/1.0e16, 0)
-                res.append(ir)
-            res = np.hstack(res)
-            return res
-    
-    def get_eye_pos_from_index(self, idx):      
-        if np.iterable(idx) == 0:   
-            idx_ = idx - 1e16*self.get_goal_from_index(idx)
-            eye_x = idx_/1.0e8
-            eye_x = np.round(eye_x, 0)
-            eye_y = idx_ - 1e8*eye_x
-            res = array([eye_x, eye_y])/1.0e5
-            print "GoalSelector:179 {}".format(res)
-            return res  
-        else:
-            res = []
-            for i in idx:
-                idx_ = i - 1e16*self.get_goal_from_index(i)
-                eye_x = idx_/1.0e8
-                eye_x = np.round(eye_x, 0)
-                eye_y = idx_ - 1e8*eye_x
-                eye_p = np.array([eye_x, eye_y])
-                res.append( eye_p/1.0e5 )        
-            return np.vstack(res)
-
-
     def goal_selection(self, im_value, goal_mask = None, eye_pos=[-99,-99] ):
         '''
         :param im_value: current intrinsic motivational value
         :param goal_mask: which goals can be selected
         '''
-        
-        self.eye_pos = eye_pos
-        
+         
         # in case we do not have a mask create one 
         # ans select all goals as possible
         if goal_mask is None:
@@ -274,6 +231,7 @@ class GoalSelector :
             self.reset_window_counter = 0
             self.echonet.reset()
             self.echonet.reset_data()
+            self.pid.reset()
     
     def step(self, inp):
         '''
@@ -294,9 +252,7 @@ class GoalSelector :
                     self.goal_win*self.goal_selected
                     )) )
 
-        eye2echo_inp = np.dot( self.EYE2ECHO_W, self.eye_pos )
-
-        echo_inp = inp2echo_inp + goal2echo_inp + eye2echo_inp
+        echo_inp = inp2echo_inp + goal2echo_inp 
         self.echonet.step(self.ECHO_AMPL*echo_inp) 
         self.echonet.store(self.goal_window_counter)
 
@@ -308,7 +264,8 @@ class GoalSelector :
             curr_match = 0.0
  
         added_signal = self.NOISE*oscillator(self.t, 10, self.random_oscil)[0]
-        self.out = self.read_out + (1.0 - curr_match)*added_signal 
+        #self.out = self.pid.step(self.out, self.read_out + (1.0 - curr_match)*added_signal)
+        self.out = self.read_out + (1.0 - curr_match)*added_signal
         self.tout = self.read_out 
         self.t += 1
 
@@ -319,10 +276,9 @@ class GoalSelector :
         #------------------------------------------------
         if goalwin_idx is not None and self.target_position.has_key(goalwin_idx):
             if self.target_position.has_key(goalwin_idx):
-                print "GoalSelector:312 {}".format(goalwin_idx)
                 target = self.target_position[goalwin_idx]
                 x = self.inp
-                y = self.read_out
+                y = self.tout
                 eta = self.ETA
                 w = self.echo2out_w
                 w += eta*np.outer(target-y,x)
