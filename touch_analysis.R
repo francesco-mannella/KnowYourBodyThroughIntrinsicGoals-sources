@@ -28,52 +28,48 @@ data_pos = dcast(data_raw, GOAL+POS+TRIAL~AXIS,  fun.aggregate = mean, value.var
 
 dev.new()
 
-cur = subset(data_pos, GOAL==1)
+grobs = list()
+i = 1
+for( g in seq(0,48) )
+{
 
-p = ggplot(cur, aes(x=x, y=y))
-p = p + geom_path(aes(group=TRIAL), color=alpha("#000000",0.1), size=1.5)
-p = p + geom_point(color=alpha("#000000",0.1),size=3)
-p = p + theme_bw()
-p = p + scale_x_continuous(limits=c(-5,5))
-p = p + scale_y_continuous(limits=c(-5,5))
-p = p + theme(
-              axis.ticks = element_blank(),
-              axis.title.x = element_blank(),
-              axis.title.y = element_blank(), 
-              axis.text.x = element_blank(),
-              axis.text.y = element_blank(),
-              panel.border = element_blank() )
-print(p)
-# 
-# # grobs = list()
-# # i = 1
-# # for( g in sort(unique(data_pos$goal)) )
-# # {
-# #     cur = subset(data_pos, goal==g)
-# #     cur_means = subset(data_pos_means, goal==g)
-# # 
-# #     p = ggplot(cur, aes(x=x, y=y, group=trial))
-# #     p = p + geom_path()
-# #     p = p + geom_point()
-# #     p = p + geom_path(data=cur_means,aes(x=x, y=y), colour="#ff0000" )
-# #     p = p + theme_bw()
-# #     p = p + theme(
-# #                   axis.ticks = element_blank(),
-# #                   axis.title.x = element_blank(),
-# #                   axis.title.y = element_blank(), 
-# #                   axis.text.x = element_blank(),
-# #                   axis.text.y = element_blank(),
-# #                   panel.border = element_blank() )
-# #     grobs[[i]] = ggplotGrob(p)
-# #     i = i + 1
-# # }
-# # 
-# # g = grid.arrange(grobs=grobs, matrix_layout=matrix(seq(49), 7, 7) )
-# # 
-# # grid.newpage()
-# # grid.draw(g)
-# # 
-# 
+    cur = subset(data_pos, GOAL==g)
+
+
+    if (  dim(cur)[1] > 0 )
+    {
+        p = ggplot(cur, aes(x=x, y=y))
+        p = p + geom_path(aes(group=TRIAL), color=alpha("#000000",0.02), size=0.5)
+        p = p + geom_point(color=alpha("#000000",0.02),size=0.7)
+        p = p + theme_bw()
+        p = p + scale_x_continuous(limits=c(-5,5))
+        p = p + scale_y_continuous(limits=c(-5,5))
+        p = p + coord_fixed(ratio=1)
+        
+        p = p + theme(
+                      axis.ticks = element_blank(),
+                      axis.title.x = element_blank(),
+                      axis.title.y = element_blank(), 
+                      axis.text.x = element_blank(),
+                      axis.text.y = element_blank(),
+                      panel.border = element_blank() )
+
+
+        grobs[[i]] = ggplotGrob(p)
+    }
+    else
+    {
+        grobs[[i]] = textGrob("")
+    }
+    i = i + 1
+}
+
+g = grid.arrange(grobs=grobs, matrix_layout=matrix(seq(49), 7, 7) )
+
+grid.newpage()
+grid.draw(g)
+
+
 # 
 # 
 # data_sensors = fread('log_sensors')
