@@ -25,7 +25,7 @@ def normalize(x) :
 class GoalMaker(object):
     def __init__(self, n_input_layers, n_singlemod_layers, n_hidden_layers, 
             n_out, n_goalrep,singlemod_lrs, hidden_lrs, output_lr, goalrep_lr, 
-            goal_th=0.9, stime=1000):
+            goal_th=0.9, single_kohonen=False, stime=1000):
         '''
         :param n_input_layers: (list) number of units per input
         :param n_singlemod_layers: (list) number of units per singlemod layer
@@ -37,6 +37,7 @@ class GoalMaker(object):
         :param output_lr: (float) learning rate of output network
         :param goalrep_lr: (float) learning rate goalrep som
         :param goal_th: (float) goal formation threshold
+        :param single_kohonen: (bool) if the internal net is to be reduced to a single kohonen
         :param stime: (int) simulation timesteps
         '''
 
@@ -49,6 +50,7 @@ class GoalMaker(object):
         self.N_OUTPUT_LAYER = n_out
         self.N_GOALREP_LAYER = n_goalrep
         self.GOAL_TH = goal_th
+        self.SINGLE_KOHONEN = single_kohonen
         self.STIME = stime
 
         self.input_layers = [np.zeros(x) for x in self.N_INPUT_LAYERS]
@@ -124,25 +126,45 @@ class GoalMaker(object):
             normalize = normalize
         )
 
-        #representations weights
+        # GOALS
+        if self.SINGLE_KOHONEN :
+            n_input =  self.N_INPUT_LAYERS[-1] # last input layer size (touch)
+            n_output = self.N_GOALREP_LAYER
+            self.goalrep_som = Kohonen(
+                n_output = n_output,
+                n_input = n_input,
+                n_dim_out = 2,
+                bins=[np.sqrt(n_output), np.sqrt(n_output)],
+                eta = goalrep_lr,
+                eta_bl=goalrep_lr / 3.0,
+                eta_decay=self.STIME / 4.,
+                neighborhood=6 * n_output,
+                neighborhood_decay=self.STIME / 4.,
+                neighborhood_bl= 0.5,
+                stime=self.STIME,
+                weight_bl=0.001,
+                normalize = normalize
+            )
 
-        n_input = sum(self.N_SINGLEMOD_LAYERS) + sum(self.N_HIDDEN_LAYERS) + self.N_OUTPUT_LAYER
-        n_output = self.N_GOALREP_LAYER
-        self.goalrep_som = Kohonen(
-            n_output = n_output,
-            n_input = n_input,
-            n_dim_out = 1,
-            bins = n_output,
-            eta = goalrep_lr,
-            eta_bl=goalrep_lr / 4.0,
-            eta_decay=self.STIME / 4.,
-            neighborhood=2 * n_output,
-            neighborhood_decay=self.STIME / 4.,
-            neighborhood_bl= 0.5,
-            stime=self.STIME,
-            weight_bl=0.001,
-            normalize = normalize
-        )
+        else:
+
+            n_input = sum(self.N_SINGLEMOD_LAYERS) + sum(self.N_HIDDEN_LAYERS) + self.N_OUTPUT_LAYER
+            n_output = self.N_GOALREP_LAYER
+            self.goalrep_som = Kohonen(
+                n_output = n_output,
+                n_input = n_input,
+                n_dim_out = 1,
+                bins = n_output,
+                eta = goalrep_lr,
+                eta_bl=goalrep_lr / 4.0,
+                eta_decay=self.STIME / 4.,
+                neighborhood=2 * n_output,
+                neighborhood_decay=self.STIME / 4.,
+                neighborhood_bl= 0.5,
+                stime=self.STIME,
+                weight_bl=0.001,
+                normalize = normalize
+            )
 
     def step(self, raw_inputs):
         '''
@@ -179,11 +201,13 @@ class GoalMaker(object):
         out_inp = np.hstack(self.hidden_layers)
 
         # goal representation
-
-        goalrep_inp = np.hstack([
-            np.hstack(self.singlemod_layers),
-            np.hstack(self.hidden_layers),
-            self.output_layer])
+        if self.SINGLE_KOHONEN :
+            goalrep_inp = np.hstack(self.input_layers[-1])   # last layer is touch 
+        else:
+            goalrep_inp = np.hstack([
+                np.hstack(self.singlemod_layers),
+                np.hstack(self.hidden_layers),
+                self.output_layer])
 
 
 

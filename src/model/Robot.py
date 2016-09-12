@@ -50,7 +50,11 @@ class Robot :
                 eta = 0.01
                 )
 
+       
         inp_dim = self.controller.pixels[0]*self.controller.pixels[1]
+        
+        self.stime = 10000
+        
         self.gm = GoalMaker.GoalMaker(
                 n_input_layers=[inp_dim, inp_dim, inp_dim],
                 n_singlemod_layers= [64, 64, 64],
@@ -60,12 +64,13 @@ class Robot :
                 singlemod_lrs = [0.05, 0.01, 0.1],
                 hidden_lrs=[0.001, 0.001],
                 output_lr=0.001,
-                goalrep_lr=0.1,
-                goal_th=0.1
+                goalrep_lr=0.8,
+                goal_th=0.1,
+                stime=self.stime,
+                single_kohonen = True
             )
 
 
-        self.stime = 10000
 
         self.trial_window = self.gs.RESET_WINDOW + self.gs.GOAL_WINDOW
         
@@ -79,7 +84,8 @@ class Robot :
         
         self.collision = False
 
-        self.log = open("../../log", "w")
+        self.log_sensors = open("../../log_sensors", "w")
+        self.log_position = open("../../log_position", "w")
    
     def get_selection_arrays(self) :
 
@@ -231,20 +237,41 @@ class Robot :
             
             if self.match_value ==1 or self.gs.goal_window_counter >= self.gs.GOAL_WINDOW:
                
-                stouch = ""
-                for touch in  self.controller.touches :
-                    stouch += "{:6.4f} ".format(touch)
-                
-                stouch += "{:6d} ".format(np.argmax(self.gs.goal_win))
+                # save match info on file 
 
-                self.log.write( stouch + "\n")
-                self.log.flush()
+                # create log line
+                log_string = ""
+                # add touch info
+                for touch in  self.controller.touches :
+                    log_string += "{:6.4f} ".format(touch)
+                # add goal index
+                log_string += "{:6d} ".format(np.argmax(self.gs.goal_win)) 
+                # save to file
+                self.log_sensors.write( log_string + "\n")
+                self.log_sensors.flush()
+        
+                # create log line
+                log_string = ""
+                # add position info
+                curr_position =  np.vstack(self.controller.curr_body_tokens).ravel() 
+                for pos in  curr_position:
+                    log_string += "{:6.4f} ".format(pos)
+                # add goal index
+                log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
+                # save to file
+                self.log_position.write( log_string + "\n")
+                self.log_position.flush()
+
+
+                # learn
 
                 self.gp.learn(self.match_value) 
 
                 if self.match_value == 1:
                     self.gs.update_target()
                 
+                # update variables
+
                 self.intrinsic_motivation_value = self.gp.prediction_error 
                 self.gs.goal_selected = False
                 self.gs.reset(match = self.match_value)

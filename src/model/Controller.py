@@ -32,7 +32,6 @@ class PerceptionManager:
         self.gm = GM(lims = np.hstack([self.lims,self.pixels.reshape(2,1)]))
         self.touch_sensors = touch_sensors 
         self.touch_th = touch_th
-        self.touch_len = touch_len 
         self.image_resolution = 10 
 
         self.chain.set_chain(np.vstack(([-1,0],[1,0])))
@@ -87,20 +86,16 @@ class PerceptionManager:
   
         self.sensors_prev = self.sensors   
         self.sensors = self.chain.get_dense_chain(self.touch_sensors)   
-        length = self.touch_len 
         sensors_n = len(self.sensors)
         touches = np.zeros(sensors_n)
         
         for x,sensor  in zip(range(sensors_n), self.sensors):
-            for y,point in  zip(range(sensors_n), self.sensors):
-                x_dist = x/float(sensors_n-1) 
-                y_dist = y/float(sensors_n-1)
-                
-                if abs(x_dist - y_dist) > length:
+            for y,point in  zip([0,sensors_n-1], self.sensors[[0,-1]]):        
+                if x != y :
                     touches[x] += \
                     np.exp(-((np.linalg.norm(point - sensor))**2)/\
                             (2*self.touch_sigma**2)  )
-              
+        
 
         lims = np.hstack([self.lims[0], sensors_n+2])
         abs_body_tokens = np.vstack([ np.linspace(*lims), 
@@ -218,6 +213,8 @@ class SensorimotorController:
         self.perc = PerceptionManager(  epsilon=0.1, 
                 lims=lims, pixels=pixels, **kargs )
 
+        self.touches = np.zeros(len(self.perc.sensors))
+        self.curr_body_tokens = self.init_body_tokens
 
     def step_kinematic(self, larm_angles, rarm_angles, 
             larm_angles_theoric, rarm_angles_theoric, 
@@ -251,22 +248,22 @@ class SensorimotorController:
         self.larm_angles, self.rarm_angles = (self.actuator.angles_l, 
                 self.actuator.angles_r)
 
-        curr_body_tokens = (self.actuator.position_l[::-1], 
+        self.curr_body_tokens = (self.actuator.position_l[::-1], 
             self.actuator.position_r) 
             
-        autocollision = self.perc.calc_collision(body_tokens=curr_body_tokens)
+        autocollision = self.perc.calc_collision(body_tokens=self.curr_body_tokens)
 
         if not autocollision :
 
             # VISUAL POSITION
-            self.pos = self.perc.get_image(body_tokens=curr_body_tokens)
+            self.pos = self.perc.get_image(body_tokens=self.curr_body_tokens)
 
             # PROPRIOCEPTION
             angles_tokens = (self.larm_angles, self.rarm_angles)
             self.prop = self.perc.get_proprioception(
                     angles_tokens=angles_tokens)
             #TOUCH
-            self.touch, self.touches = self.perc.get_touch(body_tokens=curr_body_tokens)
+            self.touch, self.touches = self.perc.get_touch(body_tokens=self.curr_body_tokens)
 
         else :
             self.larm_delta_angles  = self.larm_delta_angles_prev
@@ -285,22 +282,18 @@ class SensorimotorController:
             self.larm_angles, self.rarm_angles = (self.actuator.angles_l, 
                     self.actuator.angles_r)
 
-            curr_body_tokens = (self.actuator.position_l[::-1], 
-                self.actuator.position_r) 
       
         delta_angles_tokens = (self.larm_delta_angles,
             self.rarm_delta_angles) 
 
-        curr_body_tokens = (self.actuator.position_l[::-1], 
-            self.actuator.position_r) 
 
         # deltas
         self.pos_delta = self.perc.get_image(
-                body_tokens=curr_body_tokens)
+                body_tokens=self.curr_body_tokens)
         self.prop_delta = self.perc.get_proprioception(
                 angles_tokens=delta_angles_tokens)
         self.touch_delta = self.touch - self.touch_old
-        
+            
         return  active and autocollision 
 
     def reset(self):
