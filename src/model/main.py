@@ -7,7 +7,6 @@ import sys
 import copy
 import cPickle as pickle
 import gzip
-from time import gmtime, strftime
 
 # working dir is the base dir of this file
 pathname = os.path.dirname(sys.argv[0])
@@ -65,14 +64,17 @@ if __name__ == '__main__':
     GRAPHICS = bool(args.graphics) 
     STIME = int(args.stime)  
     SDIR = args.save_dir
+    if SDIR[-1]!='/': SDIR += '/'
+    
     DUMP = int(args.dump) 
     LOAD = int(args.load) 
 
-    sdate = strftime("%H:%M:%S", gmtime())
-    log_sensors = open(SDIR+"log_sensors_"+sdate, "w")
-    log_position = open(SDIR+"log_position_"+sdate, "w")
+    log_sensors = open(SDIR+"log_sensors_", "w")
+    log_position = open(SDIR+"log_position_", "w")
         
-    dumpfile = SDIR+"dumped_robot_"+sdate
+    dumpfile = SDIR+"dumped_robot_"
+    
+    print dumpfile
 
     if LOAD :
         print "loading ..."

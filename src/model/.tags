@@ -10,27 +10,27 @@ ETA	../nets/esn.py	/^    ETA = 50000.0$/;"	v
 GaussianMaker	../nets/kohonen.py	/^GaussianMaker = OptimizedGaussianMaker$/;"	v
 GoalAbstractionMaps	../model/plotter.py	/^class GoalAbstractionMaps(pg.GraphicsView):$/;"	c	inherits:pg.GraphicsView
 GoalMaker	../model/GoalMaker.py	/^class GoalMaker(object):$/;"	c	inherits:object
-GoalPredictor	../model/GoalPredictor.py	/^class GoalPredictor :$/;"	c	inherits:
+GoalPredictor	../model/GoalPredictor.py	/^class GoalPredictor(object) :$/;"	c	inherits:object
 GoalSelectionMaps	../model/plotter.py	/^class GoalSelectionMaps(pg.GraphicsView):$/;"	c	inherits:pg.GraphicsView
-GoalSelector	../model/GoalSelector.py	/^class GoalSelector :$/;"	c	inherits:
+GoalSelector	../model/GoalSelector.py	/^class GoalSelector(object) :$/;"	c	inherits:object
 GoalTesterSim	../model/GoalMaker.py	/^class GoalTesterSim(object):$/;"	c	inherits:object
 HVERSOR	../utils/kinematics.py	/^    HVERSOR = np.array([1,0])$/;"	v	class:Polychain
-KinematicActuator	../model/Controller.py	/^class KinematicActuator :$/;"	c	inherits:
+KinematicActuator	../model/Controller.py	/^class KinematicActuator(object) :$/;"	c	inherits:object
 KinematicsView	../model/plotter.py	/^class KinematicsView(QtGui.QWidget):$/;"	c	inherits:QtGui.QWidget
-Kohonen	../nets/kohonen.py	/^class Kohonen :  $/;"	c	inherits:
-MultidimensionalGaussianMaker	../utils/gauss_utils.py	/^class MultidimensionalGaussianMaker:$/;"	c	inherits:
+Kohonen	../nets/kohonen.py	/^class Kohonen(object) :$/;"	c	inherits:object
+MultidimensionalGaussianMaker	../utils/gauss_utils.py	/^class MultidimensionalGaussianMaker(object) :$/;"	c	inherits:object
 N	../nets/esn.py	/^    N = 200$/;"	v
 N_OUT	../nets/esn.py	/^    N_OUT = 2$/;"	v
-OneDimensionalGaussianMaker	../utils/gauss_utils.py	/^class OneDimensionalGaussianMaker:$/;"	c	inherits:
-OptimizedGaussianMaker	../utils/gauss_utils.py	/^class OptimizedGaussianMaker:$/;"	c	inherits:
-PID	../utils/kinematics.py	/^class PID:$/;"	c	inherits:
-PerceptionManager	../model/Controller.py	/^class PerceptionManager:$/;"	c	inherits:
+OneDimensionalGaussianMaker	../utils/gauss_utils.py	/^class OneDimensionalGaussianMaker(object) :$/;"	c	inherits:object
+OptimizedGaussianMaker	../utils/gauss_utils.py	/^class OptimizedGaussianMaker(object) :$/;"	c	inherits:object
+PID	../utils/kinematics.py	/^class PID(object) :$/;"	c	inherits:object
+PerceptionManager	../model/Controller.py	/^class PerceptionManager(object) :$/;"	c	inherits:object
 Plotter	../model/plotter.py	/^class Plotter(QtGui.QWidget):$/;"	c	inherits:QtGui.QWidget
-Polychain	../utils/kinematics.py	/^class Polychain :$/;"	c	inherits:
-Robot	../model/Robot.py	/^class Robot :$/;"	c	inherits:
-SensorimotorController	../model/Controller.py	/^class SensorimotorController:$/;"	c	inherits:
+Polychain	../utils/kinematics.py	/^class Polychain(object) :$/;"	c	inherits:object
+Robot	../model/Robot.py	/^class Robot(object) :$/;"	c	inherits:object
+SensorimotorController	../model/Controller.py	/^class SensorimotorController(object) :$/;"	c	inherits:object
 TRIALS	../nets/esn.py	/^    TRIALS = 200 $/;"	v
-TwoDimensionalGaussianMaker	../utils/gauss_utils.py	/^class TwoDimensionalGaussianMaker:$/;"	c	inherits:
+TwoDimensionalGaussianMaker	../utils/gauss_utils.py	/^class TwoDimensionalGaussianMaker(object) :$/;"	c	inherits:object
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:MultidimensionalGaussianMaker	file:	access:private
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:OneDimensionalGaussianMaker	file:	access:private
 __call__	../utils/gauss_utils.py	/^    def __call__(self, mu, sigma) :$/;"	m	class:OptimizedGaussianMaker	file:	access:private

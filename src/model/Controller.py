@@ -95,7 +95,7 @@ class PerceptionManager(object) :
                 [ self.sensors[0], self.sensors[-1] ] ):
             for y,point in  zip(range(sensors_n), self.sensors):        
                 if x != y and abs(x-y)>2:
-                    touches[x] += \
+                    touches[y] += \
                     np.exp(-((np.linalg.norm(point - sensor))**2)/\
                             (2*self.touch_sigma**2)  )
         

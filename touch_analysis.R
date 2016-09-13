@@ -15,6 +15,10 @@ last = 200
 data_pos = fread('log_position')
 data_sensors = fread('log_sensors')
 n_pos_rows= dim(data_pos)[1]
+if(n_pos_rows <= last)
+{
+    last = n_pos_rows-1
+}
 n_sensors_rows= dim(data_sensors)[1]
 if(last>0)
     data_pos = data_pos[(n_pos_rows-last):n_pos_rows,]
