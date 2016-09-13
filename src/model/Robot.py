@@ -238,34 +238,35 @@ class Robot(object) :
             if self.match_value ==1 or self.gs.goal_window_counter >= self.gs.GOAL_WINDOW:
                
 
-                if self.log_sensors is not None :
+                if self.match_value == 1:
+                    if self.log_sensors is not None :
 
-                    # save match info on file 
+                        # save match info on file 
 
-                    # create log line
-                    log_string = ""
-                    # add touch info
-                    for touch in  self.controller.touches :
-                        log_string += "{:6.4f} ".format(touch)
-                    # add goal index
-                    log_string += "{:6d} ".format(np.argmax(self.gs.goal_win)) 
-                    # save to file
-                    self.log_sensors.write( log_string + "\n")
-                    self.log_sensors.flush()
-            
-                if self.log_position is not None :
+                        # create log line
+                        log_string = ""
+                        # add touch info
+                        for touch in  self.controller.touches :
+                            log_string += "{:6.4f} ".format(touch)
+                        # add goal index
+                        log_string += "{:6d} ".format(np.argmax(self.gs.goal_win)) 
+                        # save to file
+                        self.log_sensors.write( log_string + "\n")
+                        self.log_sensors.flush()
+                
+                    if self.log_position is not None :
 
-                    # create log line
-                    log_string = ""
-                    # add position info
-                    curr_position =  np.vstack(self.controller.curr_body_tokens).ravel() 
-                    for pos in  curr_position:
-                        log_string += "{:6.4f} ".format(pos)
-                    # add goal index
-                    log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
-                    # save to file
-                    self.log_position.write( log_string + "\n")
-                    self.log_position.flush()
+                        # create log line
+                        log_string = ""
+                        # add position info
+                        curr_position =  np.vstack(self.controller.curr_body_tokens).ravel() 
+                        for pos in  curr_position:
+                            log_string += "{:6.4f} ".format(pos)
+                        # add goal index
+                        log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
+                        # save to file
+                        self.log_position.write( log_string + "\n")
+                        self.log_position.flush()
 
 
                 # learn
