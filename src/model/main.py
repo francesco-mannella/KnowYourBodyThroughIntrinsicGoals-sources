@@ -7,6 +7,7 @@ import sys
 import copy
 import cPickle as pickle
 import gzip
+from time import gmtime, strftime
 
 # working dir is the base dir of this file
 pathname = os.path.dirname(sys.argv[0])
@@ -54,19 +55,26 @@ if __name__ == '__main__':
     parser.add_argument('-l','--load',
             help="load the robot object",
             action="store_true", default=False) 
+    parser.add_argument('-s','--save_dir',
+            help="storage directory",
+            action="store", default="../../")      
     parser.add_argument('-t','--stime',
             help="Simulation time (only for graphics off)",
             action="store", default=2000)  
     args = parser.parse_args()
     GRAPHICS = bool(args.graphics) 
     STIME = int(args.stime)  
+    SDIR = args.save_dir
     DUMP = int(args.dump) 
     LOAD = int(args.load) 
 
-    log_sensors = open("../../log_sensors", "w")
-    log_position = open("../../log_position", "w")
+    sdate = strftime("%H:%M:%S", gmtime())
+    log_sensors = open(SDIR+"log_sensors_"+sdate, "w")
+    log_position = open(SDIR+"log_position_"+sdate, "w")
         
-    dumpfile = "dumped_robot"
+    dumpfile = SDIR+"dumped_robot_"+sdate
+
+    print dumpfile
 
     if LOAD :
         print "loading ..."
