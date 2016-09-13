@@ -88,10 +88,13 @@ class PerceptionManager(object) :
         self.sensors = self.chain.get_dense_chain(self.touch_sensors)   
         sensors_n = len(self.sensors)
         touches = np.zeros(sensors_n)
+       
+        type(self.sensors)
         
-        for x,sensor  in zip(range(sensors_n), self.sensors):
-            for y,point in  zip([0,sensors_n-1], self.sensors[[0,-1]]):        
-                if x != y :
+        for x,sensor  in zip( [0,sensors_n-1], 
+                [ self.sensors[0], self.sensors[-1] ] ):
+            for y,point in  zip(range(sensors_n), self.sensors):        
+                if x != y and abs(x-y)>2:
                     touches[x] += \
                     np.exp(-((np.linalg.norm(point - sensor))**2)/\
                             (2*self.touch_sigma**2)  )
