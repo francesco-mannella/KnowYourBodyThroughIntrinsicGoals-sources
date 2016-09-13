@@ -160,7 +160,7 @@ class GoalSelector(object) :
 
         # update the movin' average for that goal
         self.goalvec[win_indx] += self.IM_DECAY*(
-                -self.goalvec[win_indx]  +im_value)
+                -self.goalvec[win_indx]  +100.0*im_value)
 
     def goal_selection(self, goal_mask = None, eye_pos=[-99,-99] ):
         '''
