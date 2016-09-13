@@ -69,10 +69,10 @@ if __name__ == '__main__':
     DUMP = int(args.dump) 
     LOAD = int(args.load) 
 
-    log_sensors = open(SDIR+"log_sensors_", "w")
-    log_position = open(SDIR+"log_position_", "w")
+    log_sensors = open(SDIR+"log_sensors", "w")
+    log_position = open(SDIR+"log_position", "w")
         
-    dumpfile = SDIR+"dumped_robot_"
+    dumpfile = SDIR+"dumped_robot"
     
     print dumpfile
 
