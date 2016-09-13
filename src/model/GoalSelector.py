@@ -28,11 +28,11 @@ def oscillator(x, scale, p) :
     
     x = np.array(x)
     p = np.array(p)
-    pam = p[:(p.size/2)]
+    pfreq = p[:(p.size/2)]
     pph = p[(p.size/2):]
-    x = np.outer(x, np.ones(pam.shape))
+    x = np.outer(x, np.ones(pfreq.shape))
 
-    return 0.5*np.pi*np.cos(pam*np.pi*(x/scale-pph))
+    return 0.5*np.pi*np.cos(pfreq*np.pi*(x/scale-pph))
 
 
 class GoalSelector(object) :
