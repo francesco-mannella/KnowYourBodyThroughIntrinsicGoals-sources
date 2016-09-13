@@ -74,8 +74,6 @@ if __name__ == '__main__':
         
     dumpfile = SDIR+"dumped_robot"
     
-    print dumpfile
-
     if LOAD :
         print "loading ..."
         with gzip.open(dumpfile, 'rb') as f:

@@ -278,6 +278,8 @@ class Robot(object) :
                 # update variables
 
                 self.intrinsic_motivation_value = self.gp.prediction_error 
+                self.gs.goal_update(self.intrinsic_motivation_value)
+
                 self.gs.goal_selected = False
                 self.gs.reset(match = self.match_value)
                 self.controller.reset()

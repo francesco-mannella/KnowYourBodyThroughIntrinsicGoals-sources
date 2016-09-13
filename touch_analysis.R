@@ -10,7 +10,7 @@ require(gridExtra)
 
 
 
-last = 200
+last = 20000
 
 data_pos = fread('log_position')
 data_sensors = fread('log_sensors')
