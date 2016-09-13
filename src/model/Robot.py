@@ -156,14 +156,14 @@ class Robot(object) :
     def step(self) :
    
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:
+        
 
             # update the subset of goals to be selected
             self.goal_mask = np.logical_or(self.goal_mask, (self.gm.goalrep_layer > 0) )
-
+            
             # Selection
             if any(self.goal_mask==True):
                 self.gs.goal_selection(
-                        self.intrinsic_motivation_value, 
                         self.goal_mask)
             else:
                 self.gs.goal_selection(self.intrinsic_motivation_value)
