@@ -38,11 +38,12 @@ np.set_printoptions(edgeitems=3, linewidth=999,  precision=3,
 #################################################################
 #################################################################
 
+
 import progressbar
 
 ## Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-   
+ 
     import argparse
     parser = argparse.ArgumentParser() 
     parser.add_argument('-g','--graphics',
@@ -65,7 +66,8 @@ if __name__ == '__main__':
     STIME = int(args.stime)  
     SDIR = args.save_dir
     if SDIR[-1]!='/': SDIR += '/'
-    
+     
+
     DUMP = int(args.dump) 
     LOAD = int(args.load) 
 

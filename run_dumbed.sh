@@ -12,17 +12,17 @@ This script runs the robot simulation in batch modeand collects data
 
 OPTIONS:
    -t --stime       number of timesteps of a single simulation block
-   -n --n_blocks    number of simulation blocks
+   -d --dumped      path/to/dumped_robot
    -h --help        show this help
 
 EOF
 }
 
 STIME=100000
-N_BLOCKS=1
+DUMPED=
 
 # getopt
-GOTEMP="$(getopt -o "t:n:h" -l "stime:,n_blocks,help"  -n '' -- "$@")"
+GOTEMP="$(getopt -o "t:d:h" -l "stime:,dumped,help"  -n '' -- "$@")"
 
 if ! [ "$(echo -n $GOTEMP |sed -e"s/\-\-.*$//")" ]; then
     usage; exit;
@@ -34,11 +34,11 @@ eval set -- "$GOTEMP"
 while true ;
 do
     case "$1" in
-        -t | --stime) 
+       -t | --stime): 
             STIME="$2"
             shift 2;;
-         -n | --n_blocks) 
-            N_BLOCKS="$2"
+       -d | --dumped) 
+            DUMPED="$2"
             shift 2;;
        -h | --help)
             echo "on help"
@@ -53,34 +53,38 @@ done
 
 #################################################################################
 
-CMD="python src/model/main.py"
-DATADIR="store_$(date +%H%M%S)"
-mkdir $DATADIR
 
-# clean
-rm -fr log_*
+if ! [ -e $DUMPED ]; then
+    DUMPED=
+fi
 
-# run first block
-$CMD -t $STIME -d
+if [ -z $DUMPED ]; then
 
-CURR_TIME=$(date +%H%M%S)
-for f in log_*; do
-    mv $f $DATADIR/${f}_${CURR_TIME} 
-done
-cp dumped_robot $DATADIR/dumped_robot_$CURR_TIME 
-
-# run n blocks
-if [ $N_BLOCKS -gt 1 ]; then
-    for((n=0;n<$[N_BLOCKS-1];n++)); do
-        # run n-th block
-        $CMD -t $STIME -d -l 
-        CURR_TIME=$(date +%H%M%S)
-        for f in log_*; do
-            mv $f $DATADIR/${f}_${CURR_TIME} 
-        done
-        cp dumped_robot $DATADIR/dumped_robot_$CURR_TIME 
-    done
+    echo
+    echo
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo " You must choose a valid  dumped_robot file"
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo
+    usage; exit;
 fi
 
 
+CURRDIR=$(pwd)
+TMPDIR="/tmp/robot_$(date +%H%M%S)"
+mkdir $TMPDIR
+ln -s $(pwd)/src $TMPDIR/src
+cp $DUMPED $TMPDIR/dumped_robot
+cd $TMPDIR
+
+CMD="python src/model/main.py"
+
+# clean
+rm -fr log_* >/dev/null 2>&1
+
+# run first block
+$CMD -t $STIME -g -l 
+
+cd $CURRDIR
+rm -fr $TMPDIR
 
