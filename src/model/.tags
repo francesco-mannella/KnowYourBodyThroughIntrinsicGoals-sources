@@ -119,8 +119,9 @@ gmm_ts	../model/test_main.py	/^    gmm_ts = gmm_lt\/gs.N_GOAL_UNITS$/;"	v
 goal_index	../model/GoalSelector.py	/^    def goal_index(self):$/;"	m	class:GoalSelector	access:public
 goal_mask	../model/test_main.py	/^            goal_mask = np.logical_or(goal_mask, (gm.goalrep_layer > 0) )$/;"	v
 goal_mask	../model/test_main.py	/^    goal_mask = np.zeros(gs.N_GOAL_UNITS).astype("bool")$/;"	v
-goal_selection	../model/GoalSelector.py	/^    def goal_selection(self, im_value, goal_mask = None, eye_pos=[-99,-99] ):$/;"	m	class:GoalSelector	access:public
+goal_selection	../model/GoalSelector.py	/^    def goal_selection(self, goal_mask = None, eye_pos=[-99,-99] ):$/;"	m	class:GoalSelector	access:public
 goal_th	../model/test_main.py	/^            goal_th=0.1$/;"	v
+goal_update	../model/GoalSelector.py	/^    def goal_update(self, im_value ):$/;"	m	class:GoalSelector	access:public
 goal_window	../model/test_main.py	/^            goal_window = 10,$/;"	v
 goalrep_lr	../model/test_main.py	/^            goalrep_lr=0.9,$/;"	v
 goalwin_idx	../model/test_main.py	/^                goalwin_idx = gs.goal_index()$/;"	v
