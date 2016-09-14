@@ -176,9 +176,6 @@ class GoalSelector(object) :
         # if no goal has been selected
         if self.goal_selected == False :
             
-            # the index of the current highest goal
-            win_indx = np.argmax(self.goal_win)
-
             # get indices of the currently avaliable goals
             curr_goal_idcs = my_argwhere(goal_mask>0)
             # get values of the averages of the currently 

@@ -86,6 +86,8 @@ class Robot(object) :
 
         self.log_sensors = None
         self.log_position = None 
+        self.log_predictions = None 
+        self.log_targets = None 
 
     def get_selection_arrays(self) :
 
@@ -156,14 +158,14 @@ class Robot(object) :
     def step(self) :
    
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:
+        
 
             # update the subset of goals to be selected
             self.goal_mask = np.logical_or(self.goal_mask, (self.gm.goalrep_layer > 0) )
-
+            
             # Selection
             if any(self.goal_mask==True):
                 self.gs.goal_selection(
-                        self.intrinsic_motivation_value, 
                         self.goal_mask)
             else:
                 self.gs.goal_selection(self.intrinsic_motivation_value)
@@ -239,9 +241,10 @@ class Robot(object) :
                
 
                 if self.match_value == 1:
+
                     if self.log_sensors is not None :
 
-                        # save match info on file 
+                        # save sensor info on file 
 
                         # create log line
                         log_string = ""
@@ -255,6 +258,8 @@ class Robot(object) :
                         self.log_sensors.flush()
                 
                     if self.log_position is not None :
+                        
+                        # save position info on file 
 
                         # create log line
                         log_string = ""
@@ -267,6 +272,46 @@ class Robot(object) :
                         # save to file
                         self.log_position.write( log_string + "\n")
                         self.log_position.flush()
+                     
+                    if self.log_predictions is not None :
+                        
+                        # save predictions info on file 
+
+                        # create log line
+                        log_string = ""
+                        # add predictions info
+                        curr_predictions = self.gp.w
+                        for pre in  curr_predictions:
+                            log_string += "{:6.4f} ".format(pre)
+                        # add goal index
+                        log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
+                        # save to file
+                        self.log_predictions.write( log_string + "\n")
+                        self.log_predictions.flush()
+                                     
+                    if self.log_targets is not None :
+                        
+                        # save targets info on file 
+
+                        # create log line
+                        log_string = ""
+                        # add targets info
+                       
+
+                        keys = sorted(self.gs.target_position.keys())
+                        all_goals = np.NaN*np.ones( [self.gs.N_GOAL_UNITS, self.gs.N_ROUT_UNITS] )
+                        
+                        for key in sorted(self.gs.target_position.keys()):
+                            all_goals[key,:] = self.gs.target_position[key] 
+
+                        for angle in all_goals.ravel():
+                                log_string += "{:6.4f} ".format(angle)
+
+                        # add goal index
+                        log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
+                        # save to file
+                        self.log_targets.write( log_string + "\n")
+                        self.log_targets.flush()
 
 
                 # learn
