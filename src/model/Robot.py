@@ -86,6 +86,7 @@ class Robot(object) :
 
         self.log_sensors = None
         self.log_position = None 
+        self.log_predictions = None 
         self.log_targets = None 
 
     def get_selection_arrays(self) :
@@ -271,7 +272,23 @@ class Robot(object) :
                         # save to file
                         self.log_position.write( log_string + "\n")
                         self.log_position.flush()
-                    
+                     
+                    if self.log_predictions is not None :
+                        
+                        # save predictions info on file 
+
+                        # create log line
+                        log_string = ""
+                        # add predictions info
+                        curr_predictions = self.gp.w
+                        for pre in  curr_predictions:
+                            log_string += "{:6.4f} ".format(pre)
+                        # add goal index
+                        log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
+                        # save to file
+                        self.log_predictions.write( log_string + "\n")
+                        self.log_predictions.flush()
+                                     
                     if self.log_targets is not None :
                         
                         # save targets info on file 

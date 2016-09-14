@@ -71,6 +71,7 @@ if __name__ == '__main__':
 
     log_sensors = open(SDIR+"log_sensors", "w")
     log_position = open(SDIR+"log_position", "w")
+    log_predictions = open(SDIR+"log_predictions", "w")
     log_targets = open(SDIR+"log_targets", "w")
         
     dumpfile = SDIR+"dumped_robot"
@@ -84,6 +85,7 @@ if __name__ == '__main__':
 
     robot.log_sensors = log_sensors
     robot.log_position = log_position
+    robot.log_predictions = log_predictions
     robot.log_targets = log_targets
     
     print "simulating ..."
@@ -111,6 +113,7 @@ if __name__ == '__main__':
         with gzip.open(dumpfile, 'wb') as f:
             robot.log_sensors = None
             robot.log_position = None
+            robot.log_predictions = None
             robot.log_targets = None
             robot = pickle.dump(robot, f)
 
