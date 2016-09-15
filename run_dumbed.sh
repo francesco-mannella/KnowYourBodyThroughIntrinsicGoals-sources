@@ -22,7 +22,7 @@ STIME=100000
 DUMPED=
 
 # getopt
-GOTEMP="$(getopt -o "t:d:h" -l "stime:,dumped,help"  -n '' -- "$@")"
+GOTEMP="$(getopt -o "t:d:h" -l "stime:,dumped:,help"  -n '' -- "$@")"
 
 if ! [ "$(echo -n $GOTEMP |sed -e"s/\-\-.*$//")" ]; then
     usage; exit;

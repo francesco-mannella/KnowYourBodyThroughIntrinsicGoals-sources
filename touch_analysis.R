@@ -7,13 +7,11 @@ library(grid)
 require(gridExtra)
 
 
-
-
-
 last = 20000
 
 data_pos = fread('log_position')
 data_sensors = fread('log_sensors')
+data_predictions = fread('log_predictions')
 n_pos_rows= dim(data_pos)[1]
 if(n_pos_rows <= last)
 {
@@ -39,9 +37,14 @@ data_pos = dcast(data_raw, GOAL+POS+TRIAL~AXIS,  fun.aggregate = mean, value.var
 data_sensors = melt(data_sensors, id.vars=c("V21"))
 names(data_sensors) <- c('goal', 'sensor', 'activation')
 
-
-
-alpha_col =  0.2
+data_predictions$idx = seq(dim(data_predictions)[1])
+data_predictions = melt(data_predictions, id.vars=c("V50","idx"))
+names(data_predictions) <- c('goal', 'idx',  'gidx', 'prediction')
+levels(data_predictions$gidx) = seq(49)
+data_predictions$x = (as.numeric(data_predictions$gidx)-1)%%7 
+data_predictions$y = as.integer(floor((as.numeric(data_predictions$gidx)-1)/7))
+ 
+alpha_col =  0.01
 
 dev.new()
 grobs = list()
@@ -54,10 +57,11 @@ for( g in seq(0,48) )
 
     if (  dim(cur)[1] > 0 )
     {
-        p = ggplot(cur, aes(x=x, y=y))
-        p = p + geom_path(aes(group=TRIAL), color=alpha("#000000",alpha_col), size=0.5)
-        p = p + geom_point(color=alpha("#000000",alpha_col),size=0.7)
+        p = ggplot(cur, aes(x=x, y=y, color=as.numeric(TRIAL)) )
+        p = p + geom_path(size=0.5, alpha=alpha_col)
+        p = p + geom_point(size=0.7, alpha=alpha_col)
         p = p + theme_bw()
+        p = p + scale_colour_gradientn(colours=rainbow(length(cur$TRIAL)), guide="none")
         p = p + scale_x_continuous(limits=c(-5,5))
         p = p + scale_y_continuous(limits=c(-5,5))
         p = p + coord_fixed(ratio=1)

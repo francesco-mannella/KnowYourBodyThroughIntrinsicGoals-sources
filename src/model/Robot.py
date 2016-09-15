@@ -47,7 +47,7 @@ class Robot(object) :
 
         self.gp = GoalPredictor.GoalPredictor(
                 n_goal_units = self.GOAL_NUMBER,
-                eta = 0.01
+                eta = 0.001
                 )
 
        
@@ -88,6 +88,8 @@ class Robot(object) :
         self.log_position = None 
         self.log_predictions = None 
         self.log_targets = None 
+        
+        self.timestep = 0
 
     def get_selection_arrays(self) :
 
@@ -156,7 +158,10 @@ class Robot(object) :
                 target_r_pos, theor_l_pos, theor_r_pos, sensors )
 
     def step(self) :
-   
+  
+
+        self.timestep += 1 
+
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:
         
 
@@ -252,7 +257,7 @@ class Robot(object) :
                         for touch in  self.controller.touches :
                             log_string += "{:6.4f} ".format(touch)
                         # add goal index
-                        log_string += "{:6d} ".format(np.argmax(self.gs.goal_win)) 
+                        log_string += "{:6d} {:d}".format(np.argmax(self.gs.goal_win), self.timestep) 
                         # save to file
                         self.log_sensors.write( log_string + "\n")
                         self.log_sensors.flush()
@@ -268,7 +273,7 @@ class Robot(object) :
                         for pos in  curr_position:
                             log_string += "{:6.4f} ".format(pos)
                         # add goal index
-                        log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
+                        log_string += "{:6d} {:d}".format(np.argmax(self.gs.goal_win), self.timestep) 
                         # save to file
                         self.log_position.write( log_string + "\n")
                         self.log_position.flush()
@@ -284,7 +289,7 @@ class Robot(object) :
                         for pre in  curr_predictions:
                             log_string += "{:6.4f} ".format(pre)
                         # add goal index
-                        log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
+                        log_string += "{:6d} {:d}".format(np.argmax(self.gs.goal_win), self.timestep) 
                         # save to file
                         self.log_predictions.write( log_string + "\n")
                         self.log_predictions.flush()
@@ -308,7 +313,7 @@ class Robot(object) :
                                 log_string += "{:6.4f} ".format(angle)
 
                         # add goal index
-                        log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
+                        log_string += "{:6d} {:d}".format(np.argmax(self.gs.goal_win), self.timestep) 
                         # save to file
                         self.log_targets.write( log_string + "\n")
                         self.log_targets.flush()
