@@ -107,6 +107,7 @@ get_proprioception	../model/Controller.py	/^    def get_proprioception(self, ang
 get_selection_arrays	../model/Robot.py	/^    def get_selection_arrays(self) :$/;"	m	class:Robot	access:public
 get_sensory_arrays	../model/Robot.py	/^    def get_sensory_arrays(self) :$/;"	m	class:Robot	access:public
 get_touch	../model/Controller.py	/^    def get_touch(self, body_tokens):$/;"	m	class:PerceptionManager	access:public
+get_weights_metrics	../model/Robot.py	/^    def get_weights_metrics(self):$/;"	m	class:Robot	access:public
 gm	../model/test_main.py	/^    gm = GoalMaker.GoalMaker($/;"	v
 gm_height	../model/test_main.py	/^    gm_height = 1.75$/;"	v
 gm_lt	../model/test_main.py	/^    gm_lt = 1.0$/;"	v
@@ -141,6 +142,7 @@ idcs	../model/test_main.py	/^        idcs = np.squeeze(np.argwhere(gs.goal_win==
 im_decay	../model/test_main.py	/^            im_decay = 0.2,$/;"	v
 im_value	../model/test_main.py	/^                im_value = gp.prediction_error $/;"	v
 im_value	../model/test_main.py	/^    im_value = 0.0$/;"	v
+init_streams	../model/Robot.py	/^    def init_streams(self):$/;"	m	class:Robot	access:public
 inp_dim	../model/test_main.py	/^    inp_dim = controller.pixels[0]*controller.pixels[1]$/;"	v
 inp_w	../nets/esn.py	/^    inp_w = 0.5*np.ones([N, l_target])*(np.random.rand(N, l_target)<0.1)$/;"	v
 isPointInChain	../utils/kinematics.py	/^    def isPointInChain(self, point, epsilon = 0.1 ) :$/;"	m	class:Polychain	access:public
