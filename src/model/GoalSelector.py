@@ -153,7 +153,16 @@ class GoalSelector(object) :
     def get_goal_from_index(self,idx):
         return idx
         
-    def goal_selection(self, im_value, goal_mask = None, eye_pos=[-99,-99] ):
+    def goal_update(self, im_value ):
+        
+        # the index of the current highest goal
+        win_indx = np.argmax(self.goal_win)
+
+        # update the movin' average for that goal
+        self.goalvec[win_indx] += self.IM_DECAY*(
+                -self.goalvec[win_indx]  +100.0*im_value)
+
+    def goal_selection(self, goal_mask = None, eye_pos=[-99,-99] ):
         '''
         :param im_value: current intrinsic motivational value
         :param goal_mask: which goals can be selected
@@ -167,12 +176,6 @@ class GoalSelector(object) :
         # if no goal has been selected
         if self.goal_selected == False :
             
-            # the index of the current highest goal
-            win_indx = np.argmax(self.goal_win)
-            # update the movin' average for that goal
-            self.goalvec[win_indx] += self.IM_DECAY*(
-                    -self.goalvec[win_indx]  +im_value)
-
             # get indices of the currently avaliable goals
             curr_goal_idcs = my_argwhere(goal_mask>0)
             # get values of the averages of the currently 

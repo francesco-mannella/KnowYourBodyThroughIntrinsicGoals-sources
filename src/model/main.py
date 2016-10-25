@@ -42,7 +42,7 @@ import progressbar
 
 ## Start Qt event loop unless running in interactive mode.
 if __name__ == '__main__':
-   
+ 
     import argparse
     parser = argparse.ArgumentParser() 
     parser.add_argument('-g','--graphics',
@@ -65,17 +65,20 @@ if __name__ == '__main__':
     STIME = int(args.stime)  
     SDIR = args.save_dir
     if SDIR[-1]!='/': SDIR += '/'
-    
+    SDIR=os.getcwd()+'/'+SDIR
+     
     DUMP = int(args.dump) 
     LOAD = int(args.load) 
-
+   
     log_sensors = open(SDIR+"log_sensors", "w")
     log_position = open(SDIR+"log_position", "w")
-        
+    log_predictions = open(SDIR+"log_predictions", "w")
+    log_targets = open(SDIR+"log_targets", "w")
+    log_weights = open(SDIR+"log_weights", "w")
+    
+
     dumpfile = SDIR+"dumped_robot"
     
-    print dumpfile
-
     if LOAD :
         print "loading ..."
         with gzip.open(dumpfile, 'rb') as f:
@@ -85,6 +88,9 @@ if __name__ == '__main__':
 
     robot.log_sensors = log_sensors
     robot.log_position = log_position
+    robot.log_predictions = log_predictions
+    robot.log_targets = log_targets
+    robot.log_weights = log_weights
     
     print "simulating ..."
     if GRAPHICS :
@@ -109,8 +115,7 @@ if __name__ == '__main__':
         
         print "dumping ..."
         with gzip.open(dumpfile, 'wb') as f:
-            robot.log_sensors = None
-            robot.log_position = None
+            robot.init_streams()
             robot = pickle.dump(robot, f)
 
 

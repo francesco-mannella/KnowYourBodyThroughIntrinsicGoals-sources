@@ -47,7 +47,7 @@ class Robot(object) :
 
         self.gp = GoalPredictor.GoalPredictor(
                 n_goal_units = self.GOAL_NUMBER,
-                eta = 0.01
+                eta = 0.001
                 )
 
        
@@ -84,8 +84,18 @@ class Robot(object) :
         
         self.collision = False
 
+        self.init_streams()
+
+        
+        self.timestep = 0
+
+    def init_streams(self):
+
         self.log_sensors = None
         self.log_position = None 
+        self.log_predictions = None 
+        self.log_targets = None 
+        self.log_weights = None 
 
     def get_selection_arrays(self) :
 
@@ -153,17 +163,44 @@ class Robot(object) :
         return (real_l_pos, real_r_pos, target_l_pos,
                 target_r_pos, theor_l_pos, theor_r_pos, sensors )
 
+    def get_weights_metrics(self):
+
+        res = dict()
+        w = None
+        
+        # add norm of the kohonen weights
+        if self.gm.SINGLE_KOHONEN :
+            w = self.gm.goalrep_som.inp2out_w.ravel()
+        else :
+            w = np.hstack((
+                np.hstack([som.inp2out_w.ravel for som in self.gm.singlemod_soms ]),
+                np.hstack([som.inp2out_w.ravel for som in self.gm.hidden_soms ]),
+                self.gm.out_som.inp2out_w.ravel(),
+                self.gm.goalrep_som.inp2out_w.ravel() 
+                ))
+        res["kohonen_weights"] = np.linalg.norm(w)
+
+        # add norm of the ESN weights
+        w = self.gs.echo2out_w
+        res["echo_weights"] = np.linalg.norm(w)
+
+        return res  
+
+
     def step(self) :
-   
+  
+
+        self.timestep += 1 
+
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:
+        
 
             # update the subset of goals to be selected
             self.goal_mask = np.logical_or(self.goal_mask, (self.gm.goalrep_layer > 0) )
-
+            
             # Selection
             if any(self.goal_mask==True):
                 self.gs.goal_selection(
-                        self.intrinsic_motivation_value, 
                         self.goal_mask)
             else:
                 self.gs.goal_selection(self.intrinsic_motivation_value)
@@ -237,36 +274,84 @@ class Robot(object) :
             
             if self.match_value ==1 or self.gs.goal_window_counter >= self.gs.GOAL_WINDOW:
                
+                if self.match_value == 1:
 
-                if self.log_sensors is not None :
+                    if self.log_sensors is not None :
 
-                    # save match info on file 
+                        # save sensor info on file 
 
-                    # create log line
-                    log_string = ""
-                    # add touch info
-                    for touch in  self.controller.touches :
-                        log_string += "{:6.4f} ".format(touch)
-                    # add goal index
-                    log_string += "{:6d} ".format(np.argmax(self.gs.goal_win)) 
-                    # save to file
-                    self.log_sensors.write( log_string + "\n")
-                    self.log_sensors.flush()
-            
-                if self.log_position is not None :
+                        # create log line
+                        log_string = ""
+                        # add timing
+                        log_string += "{:8d} ".format(self.timestep)
+                        # add touch info
+                        for touch in  self.controller.touches :
+                            log_string += "{:6.4f} ".format(touch)
+                        # add goal index
+                        log_string += "{:6d} {:d}".format(np.argmax(self.gs.goal_win), self.timestep) 
+                        # save to file
+                        self.log_sensors.write( log_string + "\n")
+                        self.log_sensors.flush()
+                
+                    if self.log_position is not None :
+                        
+                        # save position info on file 
 
-                    # create log line
-                    log_string = ""
-                    # add position info
-                    curr_position =  np.vstack(self.controller.curr_body_tokens).ravel() 
-                    for pos in  curr_position:
-                        log_string += "{:6.4f} ".format(pos)
-                    # add goal index
-                    log_string += "{:6d} ".format(np.argmax(self.gs.goal_win))  
-                    # save to file
-                    self.log_position.write( log_string + "\n")
-                    self.log_position.flush()
+                        # create log line
+                        log_string = ""
+                        # add timing
+                        log_string += "{:8d} ".format(self.timestep)
+                        # add position info
+                        curr_position =  np.vstack(self.controller.curr_body_tokens).ravel() 
+                        for pos in  curr_position:
+                            log_string += "{:6.4f} ".format(pos)
+                        # add goal index
+                        log_string += "{:6d} {:d}".format(np.argmax(self.gs.goal_win), self.timestep) 
+                        # save to file
+                        self.log_position.write( log_string + "\n")
+                        self.log_position.flush()
+                     
+                    if self.log_predictions is not None :
+                        
+                        # save predictions info on file 
 
+                        # create log line
+                        log_string = ""
+                        # add timing
+                        log_string += "{:8d} ".format(self.timestep)
+                        # add predictions info
+                        curr_predictions = self.gp.w
+                        for pre in  curr_predictions:
+                            log_string += "{:6.4f} ".format(pre)
+                        # add goal index
+                        log_string += "{:6d} {:d}".format(np.argmax(self.gs.goal_win), self.timestep) 
+                        # save to file
+                        self.log_predictions.write( log_string + "\n")
+                        self.log_predictions.flush()
+                                     
+                    if self.log_targets is not None :
+                        
+                        # save targets info on file 
+
+                        # create log line
+                        log_string = ""
+                        # add timing
+                        log_string += "{:8d} ".format(self.timestep)
+                        # add targets info
+                        keys = sorted(self.gs.target_position.keys())
+                        all_goals = np.NaN*np.ones( [self.gs.N_GOAL_UNITS, self.gs.N_ROUT_UNITS] )
+                        
+                        for key in sorted(self.gs.target_position.keys()):
+                            all_goals[key,:] = self.gs.target_position[key] 
+
+                        for angle in all_goals.ravel():
+                                log_string += "{:6.4f} ".format(angle)
+
+                        # add goal index
+                        log_string += "{:6d} {:d}".format(np.argmax(self.gs.goal_win), self.timestep) 
+                        # save to file
+                        self.log_targets.write( log_string + "\n")
+                        self.log_targets.flush()
 
                 # learn
 
@@ -274,10 +359,25 @@ class Robot(object) :
 
                 if self.match_value == 1:
                     self.gs.update_target()
-                
+              
+                # save weights metrics
+                if self.log_weights is not None :
+                    # create log line
+                    log_string = ""
+                    # add timing
+                    log_string += "{:8d} ".format(self.timestep)
+                    wm = self.get_weights_metrics()
+                    log_string += "{:6.4} ".format( wm["kohonen_weights"] )
+                    log_string += "{:6.4} ".format( wm["echo_weights"] )
+
+                    self.log_weights.write( log_string + "\n")
+                    self.log_weights.flush()
+
                 # update variables
 
                 self.intrinsic_motivation_value = self.gp.prediction_error 
+                self.gs.goal_update(self.intrinsic_motivation_value)
+
                 self.gs.goal_selected = False
                 self.gs.reset(match = self.match_value)
                 self.controller.reset()
