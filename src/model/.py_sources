@@ -6,4 +6,5 @@
 ./Robot.py
 ./__init__.py
 ./main.py
+./plotter.py
 ./test_main.py

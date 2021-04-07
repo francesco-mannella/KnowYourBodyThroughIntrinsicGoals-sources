@@ -54,8 +54,8 @@ def oscillator(x, scale, p) :
     
     x = np.array(x)
     p = np.array(p)
-    pfreq = p[:(p.size/2)]
-    pph = p[(p.size/2):]
+    pfreq = p[:(p.size//2)]
+    pph = p[(p.size//2):]
     x = np.outer(x, np.ones(pfreq.shape))
 
     return 0.5*np.pi*np.cos(pfreq*np.pi*(x/scale-pph))
@@ -125,7 +125,7 @@ class GoalSelector(object) :
 
         # input -> ESN
         
-        unit_int = self.N_ECHO_UNITS/4
+        unit_int = self.N_ECHO_UNITS//4
         self.INP2ECHO_W = np.zeros([self.N_ECHO_UNITS, 
             self.N_INPUT+ self.N_GOAL_UNITS])
         
@@ -142,12 +142,12 @@ class GoalSelector(object) :
         self.GOAL2ECHO_W = np.zeros([self.N_ECHO_UNITS, 
             self.N_GOAL_UNITS])
        
-        self.GOAL2ECHO_W[:(self.N_ECHO_UNITS/2), :] = \
-                -np.random.rand(self.N_ECHO_UNITS/2, 
+        self.GOAL2ECHO_W[:self.N_ECHO_UNITS//2, :] = \
+                -np.random.rand(self.N_ECHO_UNITS//2, 
                         self.N_GOAL_UNITS )
 
-        self.GOAL2ECHO_W[:(self.N_ECHO_UNITS/2), :] *= \
-                (np.random.rand((self.N_ECHO_UNITS/2),
+        self.GOAL2ECHO_W[:(self.N_ECHO_UNITS//2), :] *= \
+                (np.random.rand((self.N_ECHO_UNITS//2),
                     self.N_GOAL_UNITS)<self.GOAL2ECHO_SPARSENESS)
  
         self.echo2out_w = 0.1*np.random.randn(self.N_ROUT_UNITS,
@@ -228,7 +228,7 @@ class GoalSelector(object) :
             self.goal_selected = True
             
             goalwin_idx = self.goal_index()
-            if goalwin_idx is not None and self.target_position.has_key(goalwin_idx):
+            if goalwin_idx is not None and  goalwin_idx in self.target_position:
                 target = self.target_position[goalwin_idx]
                 self.gout = target 
             else : 
@@ -303,8 +303,8 @@ class GoalSelector(object) :
         goalwin_idx = self.goal_index()
 
         #------------------------------------------------
-        if goalwin_idx is not None and self.target_position.has_key(goalwin_idx):
-            if self.target_position.has_key(goalwin_idx):
+        if goalwin_idx is not None:
+            if goalwin_idx in self.target_position:
                 target = self.target_position[goalwin_idx]
                 x = self.inp
                 y = self.tout

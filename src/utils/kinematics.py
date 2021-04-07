@@ -83,11 +83,11 @@ class Polychain(object) :
         # calculate segments lengths
         self.seg_lens = [ 
                 np.linalg.norm( self.chain[x] -  self.chain[x-1] ) \
-                for x in xrange(1, self.ln) ]
+                for x in range(1, self.ln) ]
 
         # calculate angles at the vertices
         self.seg_angles = []
-        for x in xrange(1, self.ln ) :
+        for x in range(1, self.ln ) :
             if x == 1 :
                 ab = self.HVERSOR
             else :
@@ -99,13 +99,13 @@ class Polychain(object) :
         self.intersect = None
         (start, end) = self.chain[[1,-1]]
 
-        for x in xrange(1,len(self.chain) ) :
+        for x in range(1,len(self.chain) ) :
             
             p = self.chain[x-1]
             rp = self.chain[x]
             r = rp - p
             
-            for y in xrange(1,len(self.chain) ) :
+            for y in range(1,len(self.chain) ) :
                 q = self.chain[y-1]
                 sq = self.chain[y] 
                 s = sq - q                 
@@ -154,7 +154,7 @@ class Polychain(object) :
 
         distances = []
         c = array(point)
-        for x in xrange(1,len(self.chain) ) :
+        for x in range(1,len(self.chain) ) :
             
             a = self.chain[x-1]
             b = self.chain[x]
@@ -188,7 +188,7 @@ class Polychain(object) :
         distance = sum(self.seg_lens)*distance
         cum_ln = 0
             
-        for l in xrange(self.ln-1) :
+        for l in range(self.ln-1) :
             s_ln = self.seg_lens[l]
             if cum_ln <= distance <= cum_ln+s_ln :
                 break 
@@ -209,7 +209,7 @@ class Polychain(object) :
         dense_chain = []
         points = density
         dense_chain.append(self.get_point( 0 ))
-        for x in xrange( density ) :
+        for x in range( density ) :
             dense_chain.append(self.get_point( (1+x)/float(density+1) ))
 
         dense_chain.append(self.get_point( 1 ))

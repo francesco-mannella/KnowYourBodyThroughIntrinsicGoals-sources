@@ -46,7 +46,7 @@ def map1DND(x,nDim,nBin) :
         raise(ValueError( "index is greater than Bin**nDim" ))
 
     idcs = np.zeros(nDim)
-    for i in xrange(nDim) :
+    for i in range(nDim) :
         idcs[nDim -1 -i] = x%nBin[nDim -1 -i]
         x /= nBin[nDim -1 -i]
     
@@ -63,7 +63,7 @@ def mapND1D(idcs,nBin) :
     nDim = len(idcs)
 
     return int(sum( [  idcs[nDim -1 -x]*(nBin[x]**x)
-        for x in xrange(nDim) ] ))
+        for x in range(nDim) ] ))
 
 def grid(bins) :
     
@@ -94,7 +94,7 @@ def scaled_grid(idcs, lims) :
     idcs = idcs.astype("int")
     scaled = np.zeros(idcs.shape)
     
-    for i in xrange(len(lims)):
+    for i in range(len(lims)):
        
         x = np.linspace(*lims[i], num = (max(idcs[:,i])+1))
         scaled[:,i] += x[idcs[:,i]]
@@ -127,7 +127,7 @@ class TwoDimensionalGaussianMaker(object) :
 
     def __init__(self, lims) :
 
-        lims = np.vstack(lims) 
+        lims = np.vstack(lims).astype(int) 
         x = np.linspace(*lims[0])
         y = np.linspace(*lims[1])
         self.X, self.Y = np.meshgrid(x,y)
@@ -198,21 +198,21 @@ if __name__ == "__main__" :
 
     m = arange(15).reshape(3,5)
 
-    print m
-    print
+    print(m)
+    print()
 
-    for x in xrange(3):
+    for x in range(3):
         line = ""
-        for y in xrange(5):
+        for y in range(5):
             line=line+ "{} ".format(mapND1D([x,y],[3,5]))
-        print line
+        print(line)
 
-    print
+    print()
 
     line = ""
-    for x in xrange(15):
+    for x in range(15):
         if x%5 == 0 :
-            print line
+            print(line)
             line =""
         line=line+ "{} ".format(map1DND(x,2,[3,5]))
-    print line
+    print(line)

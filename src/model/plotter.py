@@ -58,7 +58,7 @@ def reshape_weights(w):
 
     n_single_w = len(w)
     out_raws = np.sqrt(n_single_w)
-    for single_w, i in zip(w, xrange(n_single_w)):
+    for single_w, i in zip(w, range(n_single_w)):
         reshaped_w_raw.append(
             single_w.reshape(single_w_cols,
                 single_w_raws, order="F"))
@@ -83,7 +83,7 @@ def reshape_coupled_weights(w):
 
     n_single_w = len(w)
     out_raws = np.sqrt(n_single_w)
-    for single_w, i in zip(w, xrange(n_single_w)):
+    for single_w, i in zip(w, range(n_single_w)):
         reshaped_w_raw.append(
             single_w.reshape(single_w_cols,
                 single_w_raws, order="F"))
@@ -116,21 +116,21 @@ class Plotter(QtGui.QWidget):
         self.HEIGHT = height*(6/20.)
         
         self.setGeometry(self.LEFT, self.TOP, self.WIDTH, self.HEIGHT) 
-	self.setWindowTitle("MainBoard")
+        self.setWindowTitle("MainBoard")
         
         self.amapsButton = QtGui.QCheckBox('Abstraction Maps', self)
-	self.amapsButton.clicked.connect(self.onAMapsButton)
-	self.amapsButton.move(20,20)
+        self.amapsButton.clicked.connect(self.onAMapsButton)
+        self.amapsButton.move(20,20)
         self.amaps_toggle = False;
         
         self.smapsButton = QtGui.QCheckBox('Selection Maps', self)
-	self.smapsButton.clicked.connect(self.onSMapsButton)
-	self.smapsButton.move(20,50)
+        self.smapsButton.clicked.connect(self.onSMapsButton)
+        self.smapsButton.move(20,50)
         self.smaps_toggle = False;
         
         self.kinButton = QtGui.QCheckBox('Kinematics', self)
-	self.kinButton.clicked.connect(self.onKinButton)
-	self.kinButton.move(20,80)
+        self.kinButton.clicked.connect(self.onKinButton)
+        self.kinButton.move(20,80)
         self.kin_toggle = False;
 
         self.simButton = QtGui.QPushButton('Run', self)
@@ -232,12 +232,12 @@ class GoalAbstractionMaps(pg.GraphicsView):
         
     def __init__(self, app, robot):
          
-	super(GoalAbstractionMaps, self).__init__()
+        super(GoalAbstractionMaps, self).__init__()
         self.robot = robot
         self.ts_duration = 1 
         self.main_app = app
 
-	self.setWindowTitle("Maps")
+        self.setWindowTitle("Maps")
         
         self.resetWindow()
 
@@ -290,7 +290,7 @@ class GoalAbstractionMaps(pg.GraphicsView):
 
     def append_views(self, items=1, row=None, col=None, 
             rowspan=1, colspan=1) :
-        for x in xrange(items) :
+        for x in range(items) :
             (view, img) = self.add_img(self.layout, row=row, 
                     col=col, rowspan=rowspan, colspan=colspan)
             self.views.append(view)
@@ -437,12 +437,12 @@ class GoalSelectionMaps(pg.GraphicsView):
         
     def __init__(self, app, robot):
          
-	super(GoalSelectionMaps, self).__init__()
+        super(GoalSelectionMaps, self).__init__()
         self.main_app = app
         
         self.resetWindow()
 
-	self.setWindowTitle("Selection and control")
+        self.setWindowTitle("Selection and control")
                
         layout = pg.GraphicsLayout()
         self.setCentralItem(layout)  
@@ -578,7 +578,7 @@ class GoalSelectionMaps(pg.GraphicsView):
 class KinematicsView(QtGui.QWidget):
     
     def __init__(self, app, robot):
-	
+        
         super(KinematicsView, self).__init__()
         
         self.main_app = app
@@ -591,7 +591,7 @@ class KinematicsView(QtGui.QWidget):
         self.STIME = robot.stime
         self.robot = robot
 
-	self.setWindowTitle("Kinematics")
+        self.setWindowTitle("Kinematics")
 
         self.ts_duration = 10
         self.time_id = self.startTimer(self.ts_duration)

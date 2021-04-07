@@ -174,7 +174,7 @@ class Robot(object) :
         goalwin_idx =  self.gs.goal_index()
         target_l_pos = self.controller.target_actuator.position_l
         target_r_pos = self.controller.target_actuator.position_r
-        if  not self.gs.target_position.has_key(goalwin_idx) :
+        if  not goalwin_idx in self.gs.target_position :
             target_l_pos *= 0
             target_r_pos *= 0
 
@@ -251,12 +251,12 @@ class Robot(object) :
         # Movement
         self.gs.step( self.static_inp )
 
-        larm_angles=np.pi*self.gs.out[:(self.gs.N_ROUT_UNITS/2)]
-        rarm_angles=np.pi*self.gs.out[(self.gs.N_ROUT_UNITS/2):]
-        larm_angles_theoric=np.pi*self.gs.tout[:(self.gs.N_ROUT_UNITS/2)]
-        rarm_angles_theoric=np.pi*self.gs.tout[(self.gs.N_ROUT_UNITS/2):]
-        larm_angles_target=np.pi*self.gs.gout[:(self.gs.N_ROUT_UNITS/2)]
-        rarm_angles_target=np.pi*self.gs.gout[(self.gs.N_ROUT_UNITS/2):]
+        larm_angles=np.pi*self.gs.out[:(self.gs.N_ROUT_UNITS//2)]
+        rarm_angles=np.pi*self.gs.out[(self.gs.N_ROUT_UNITS//2):]
+        larm_angles_theoric=np.pi*self.gs.tout[:(self.gs.N_ROUT_UNITS//2)]
+        rarm_angles_theoric=np.pi*self.gs.tout[(self.gs.N_ROUT_UNITS//2):]
+        larm_angles_target=np.pi*self.gs.gout[:(self.gs.N_ROUT_UNITS//2)]
+        rarm_angles_target=np.pi*self.gs.gout[(self.gs.N_ROUT_UNITS//2):]
 
         collision = self.controller.step_kinematic(
                 larm_angles=larm_angles,
@@ -270,8 +270,8 @@ class Robot(object) :
         
         self.collision = collision
         if self.collision :
-            self.gs.out[:(self.gs.N_ROUT_UNITS/2)] = self.controller.larm_angles/np.pi
-            self.gs.out[(self.gs.N_ROUT_UNITS/2):] = self.controller.rarm_angles/np.pi
+            self.gs.out[:(self.gs.N_ROUT_UNITS//2)] = self.controller.larm_angles/np.pi
+            self.gs.out[(self.gs.N_ROUT_UNITS//2):] = self.controller.rarm_angles/np.pi
    
 
         if self.gs.reset_window_counter >= self.gs.RESET_WINDOW:

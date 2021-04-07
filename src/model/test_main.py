@@ -197,7 +197,7 @@ if __name__ == "__main__":
 
     goal_mask = np.zeros(gs.N_GOAL_UNITS).astype("bool")
 
-    for t in xrange(stime):
+    for t in range(stime):
 
 
         if gs.reset_window_counter>=gs.RESET_WINDOW:

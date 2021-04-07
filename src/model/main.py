@@ -31,7 +31,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
 import sys
 import copy
-import cPickle as pickle
+import pickle
 import gzip
 
 # working dir is the base dir of this file
@@ -46,7 +46,7 @@ sys.path.append("../")
 
 import traceback
 def my_excepthook(type, value, tback): 
-    traceback.print_exception(type,value,tback) 
+    traceback.print(_exception(type,value,tback) )
     sys.exit(1)
 
 sys.excepthook = my_excepthook
@@ -57,8 +57,8 @@ sys.excepthook = my_excepthook
 import numpy as np
 from Robot import Robot
 
-np.set_printoptions(edgeitems=3, linewidth=999,  precision=3,
-        suppress=True, threshold=1000)
+np.set_printoptions(edgeitems=3, linewidth=999,  precision=3, 
+    suppress=True, threshold=1000)
 
 
 #################################################################
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     dumpfile = SDIR+"dumped_robot"
     
     if LOAD :
-        print "loading ..."
+        print("loading ...")
         with gzip.open(dumpfile, 'rb') as f:
             robot = pickle.load(f)
     else :
@@ -118,9 +118,8 @@ if __name__ == '__main__':
     robot.log_targets = log_targets
     robot.log_weights = log_weights
     
-    print "simulating ..."
+    print("simulating ...")
     if GRAPHICS :
-
         import plotter 
         plotter.graph_main(robot)
         
@@ -139,7 +138,7 @@ if __name__ == '__main__':
 
     if DUMP :
         
-        print "dumping ..."
+        print("dumping ...")
         with gzip.open(dumpfile, 'wb') as f:
             robot.init_streams()
             robot = pickle.dump(robot, f)

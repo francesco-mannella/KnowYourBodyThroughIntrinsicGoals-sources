@@ -84,7 +84,7 @@ class PerceptionManager(object) :
 
         image = np.zeros(self.pixels).astype("float")
         all_angles = np.hstack(angles_tokens)
-        lims = np.hstack([self.lims, len(all_angles)*np.ones([2,1]) ])
+        lims = np.hstack([self.lims, len(all_angles)*np.ones([2,1]) ]).astype(int)
         abs_body_tokens = np.vstack([ np.linspace(*lims[0]), 
             self.ycenter*np.ones(len(all_angles))]).T
         for point, angle in zip(abs_body_tokens, all_angles):
@@ -126,7 +126,7 @@ class PerceptionManager(object) :
                             (2*self.touch_sigma**2)  )
         
 
-        lims = np.hstack([self.lims[0], sensors_n+2])
+        lims = np.hstack([self.lims[0], sensors_n+2]).astype(int)
         abs_body_tokens = np.vstack([ np.linspace(*lims), 
             self.ycenter*np.ones(sensors_n+2)]).T
 

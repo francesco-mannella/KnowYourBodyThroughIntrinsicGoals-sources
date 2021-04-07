@@ -313,8 +313,8 @@ if __name__ == "__main__":
     rout_mean = np.zeros(N_OUT)
    
     rout_real = np.zeros(N_OUT) 
-    for k in xrange(TRIALS) :
-        for t in xrange(echo.STIME) :
+    for k in range(TRIALS) :
+        for t in range(echo.STIME) :
             
             mask = np.zeros(l_target)
             for i in range(l_target) :
@@ -349,7 +349,7 @@ if __name__ == "__main__":
 
     raw_input("press for single test")
 
-    for t in xrange(echo.STIME) :
+    for t in range(echo.STIME) :
                 
         mask = np.zeros(l_target)
         for i in range(l_target) :

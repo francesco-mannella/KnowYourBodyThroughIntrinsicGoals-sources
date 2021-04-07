@@ -103,7 +103,7 @@ class Kohonen(object) :
 
          
         lims = [ [0,self.BINS[x]-1,self.BINS[x]]
-                for x in xrange(self.N_DIM_OUT) ]
+                for x in range(self.N_DIM_OUT) ]
         self.gmaker = GaussianMaker(lims)
         
         # timing

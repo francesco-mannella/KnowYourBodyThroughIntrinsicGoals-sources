@@ -91,7 +91,7 @@ class GoalMaker(object):
         # SINGLE MODALITY LAYERS
 
         self.singlemod_soms = []
-        for n_singlemod in xrange(self.TOT_SINGLEMOD_LAYERS):
+        for n_singlemod in range(self.TOT_SINGLEMOD_LAYERS):
             n_input = self.N_INPUT_LAYERS[n_singlemod]
             n_output = self.N_SINGLEMOD_LAYERS[n_singlemod]
             net = Kohonen(
@@ -113,7 +113,7 @@ class GoalMaker(object):
 
         # HIDDEN
         self.hidden_soms = []
-        for n_hidden in xrange(self.TOT_HIDDEN_LAYERS):
+        for n_hidden in range(self.TOT_HIDDEN_LAYERS):
             n_input = sum(self.N_SINGLEMOD_LAYERS[n_hidden:(n_hidden + 2)])
             n_output = self.N_HIDDEN_LAYERS[n_hidden]
             net = Kohonen(
@@ -204,7 +204,7 @@ class GoalMaker(object):
             """
 
         # Derivatives
-        for layer in xrange(self.TOT_INPUT_LAYERS):
+        for layer in range(self.TOT_INPUT_LAYERS):
             self.input_layers[layer] = \
                 raw_inputs[layer] - self.prev_raw_inputs[layer]
 
@@ -213,13 +213,13 @@ class GoalMaker(object):
         # singlemod
 
         n_singlemod_inp = []
-        for n_singlemod in xrange(self.TOT_INPUT_LAYERS):
+        for n_singlemod in range(self.TOT_INPUT_LAYERS):
             n_singlemod_inp.append(self.input_layers[n_singlemod])
 
         # hidden
 
         n_hidden_inp = []
-        for n_hidden in xrange(self.TOT_SINGLEMOD_LAYERS):
+        for n_hidden in range(self.TOT_SINGLEMOD_LAYERS):
             n_hidden_inp.append(np.hstack(self.singlemod_layers[n_hidden:(n_hidden + 2)]))
 
         # output
@@ -240,11 +240,11 @@ class GoalMaker(object):
         # SPREADING
 
         # input to single modality
-        for n_singlemod in xrange(self.TOT_SINGLEMOD_LAYERS):
+        for n_singlemod in range(self.TOT_SINGLEMOD_LAYERS):
             self.singlemod_soms[n_singlemod].step(n_singlemod_inp[n_singlemod])
 
         # single modality to hidden
-        for n_hidden in xrange(self.TOT_HIDDEN_LAYERS):
+        for n_hidden in range(self.TOT_HIDDEN_LAYERS):
             self.hidden_soms[n_hidden].step(n_hidden_inp[n_hidden])
 
         # hidden to output
@@ -257,7 +257,7 @@ class GoalMaker(object):
 
         # single modality (The activation is multiplied 
         # times the highest unit of the som)
-        for n_singlemod in xrange(self.TOT_SINGLEMOD_LAYERS): 
+        for n_singlemod in range(self.TOT_SINGLEMOD_LAYERS): 
             self.singlemod_layers[n_singlemod] = step_fun(
                 (self.singlemod_soms[n_singlemod].out == 1) *
                 self.singlemod_soms[n_singlemod].out_raw,
@@ -265,7 +265,7 @@ class GoalMaker(object):
 
         # hidden (The activation is multiplied 
         # times the highest unit of the som)
-        for n_hidden in xrange(self.TOT_HIDDEN_LAYERS):
+        for n_hidden in range(self.TOT_HIDDEN_LAYERS):
             self.hidden_layers[n_hidden] = step_fun(
                 (self.hidden_soms[n_hidden].out == 1) *
                 self.hidden_soms[n_hidden].out_raw,
@@ -284,7 +284,7 @@ class GoalMaker(object):
                 self.goalrep_som.out_raw, self.GOAL_TH)
 
         # previous input storing
-        for layer in xrange(self.TOT_INPUT_LAYERS):
+        for layer in range(self.TOT_INPUT_LAYERS):
             self.prev_raw_inputs[layer] = raw_inputs[layer]
 
     def store(self):
